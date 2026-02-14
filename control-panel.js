@@ -243,7 +243,9 @@ let currentSectionFilter = 'all';
 // Load gallery data from JSON file
 async function loadGalleryData() {
     try {
-        const response = await fetch('gallery-data.json');
+        // Use GitHub raw URL for reliability (works even if GitHub Pages hasn't updated yet)
+        const galleryDataUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.dataFile}`;
+        const response = await fetch(galleryDataUrl);
         if (!response.ok) {
             throw new Error('Failed to load gallery data');
         }
