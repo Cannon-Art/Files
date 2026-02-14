@@ -741,6 +741,9 @@ async function addPicture() {
         return;
     }
     
+    // Debug: Log the year value
+    console.log('Year value captured:', year, 'Type:', typeof year);
+    
     // Create new picture object
     const newPicture = {
         id: generateId(section),
@@ -748,8 +751,10 @@ async function addPicture() {
         imageUrl: imageUrl,
         medium: medium,
         notes: notes || '',
-        year: year || ''
+        year: year ? String(year).trim() : ''  // Ensure year is a string and trimmed
     };
+    
+    console.log('New picture object:', newPicture);
     
     // Add to gallery data
     if (!galleryData.sections[section]) {
