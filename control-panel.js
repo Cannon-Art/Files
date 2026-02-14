@@ -790,10 +790,22 @@ async function updatePictureField(pictureId, section, field, value) {
         // Update JSON export
         updateJSONExport();
         
-        // Try to update on GitHub if token is configured
+        // Auto-save to GitHub (JSON + HTML) if token is configured
         if (hasGitHubToken()) {
             try {
+                // Save JSON
                 await updateGalleryDataOnGitHub(galleryData);
+                
+                // Generate and save HTML files
+                const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+                for (const sectionId of Object.keys(generatedHTMLs)) {
+                    try {
+                        const file = generatedHTMLs[sectionId];
+                        await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
+                    } catch (error) {
+                        console.error(`Failed to save ${file.filename}:`, error);
+                    }
+                }
             } catch (error) {
                 console.error('Failed to update GitHub:', error);
                 // Silently fail - user can still copy JSON manually
