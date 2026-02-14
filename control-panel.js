@@ -1236,11 +1236,15 @@ async function saveHTMLToGitHub(sectionId) {
     }
 }
 
+// Store reference to html-generator.js function BEFORE defining our wrapper
+// This prevents infinite recursion when our wrapper overwrites window.generateAllGalleryHTMLs
+const htmlGeneratorGenerateAll = typeof window !== 'undefined' ? window.generateAllGalleryHTMLs : null;
+
 // Helper function to use the HTML generator (from html-generator.js)
 function generateAllGalleryHTMLs(galleryData) {
-    // Use the function from html-generator.js if available
-    if (typeof window !== 'undefined' && window.generateAllGalleryHTMLs) {
-        return window.generateAllGalleryHTMLs(galleryData);
+    // Use the function from html-generator.js if available (stored before we overwrote it)
+    if (htmlGeneratorGenerateAll && typeof htmlGeneratorGenerateAll === 'function') {
+        return htmlGeneratorGenerateAll(galleryData);
     }
     
     // Fallback: implement inline if html-generator.js didn't load
