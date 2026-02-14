@@ -15,11 +15,18 @@ const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721
 
 // Simple SHA-256 hashing function (client-side)
 async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    try {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        // Fallback: crypto.subtle requires HTTPS, but we can use a simple hash as fallback
+        // For now, throw error to alert user
+        throw new Error('Password hashing failed. Please ensure you are using HTTPS.');
+    }
 }
 
 // Check password on login
@@ -29,7 +36,7 @@ async function checkPassword() {
     const loginForm = document.getElementById('loginForm');
     const controlPanel = document.getElementById('controlPanel');
     
-    const password = passwordInput.value;
+    const password = passwordInput.value.trim(); // Trim whitespace
     if (!password) {
         loginError.textContent = 'Please enter a password';
         loginError.classList.remove('hidden');
@@ -38,6 +45,10 @@ async function checkPassword() {
     
     // Hash the entered password and compare
     const hash = await sha256(password);
+    
+    // Debug: Uncomment the line below to see the hash in console (remove after testing)
+    // console.log('Entered password hash:', hash);
+    // console.log('Expected hash:', PASSWORD_HASH);
     
     if (hash === PASSWORD_HASH) {
         // Correct password - show control panel
