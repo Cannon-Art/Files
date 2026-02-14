@@ -11,6 +11,7 @@
 // 2. Enter your new password
 // 3. Copy the hash
 // 4. Replace the value below with the new hash
+// Verified hash for "password": 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
 const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // Default: "password"
 
 // Simple SHA-256 hashing function (client-side)
@@ -44,11 +45,20 @@ async function checkPassword() {
     }
     
     // Hash the entered password and compare
-    const hash = await sha256(password);
+    let hash;
+    try {
+        hash = await sha256(password);
+    } catch (error) {
+        loginError.textContent = 'Error: ' + error.message + ' Please ensure you are accessing via HTTPS.';
+        loginError.classList.remove('hidden');
+        return;
+    }
     
-    // Debug: Uncomment the line below to see the hash in console (remove after testing)
-    // console.log('Entered password hash:', hash);
-    // console.log('Expected hash:', PASSWORD_HASH);
+    // Debug logging (check browser console)
+    console.log('Entered password:', password);
+    console.log('Entered password hash:', hash);
+    console.log('Expected hash:', PASSWORD_HASH);
+    console.log('Hashes match:', hash === PASSWORD_HASH);
     
     if (hash === PASSWORD_HASH) {
         // Correct password - show control panel
