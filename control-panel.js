@@ -283,6 +283,7 @@ function loadGitHubTokenStatus() {
     const tokenInput = document.getElementById('githubToken');
     const tokenStatusText = document.getElementById('tokenStatusText');
     const saveToGitHubBtn = document.getElementById('saveToGitHubBtn');
+    const saveAllMessage = document.getElementById('saveAllMessage');
     const imageUrlRequired = document.getElementById('imageUrlRequired');
     
     if (token) {
@@ -292,12 +293,14 @@ function loadGitHubTokenStatus() {
         tokenStatusText.parentElement.style.backgroundColor = '#d4edda';
         tokenStatusText.parentElement.style.color = '#155724';
         saveToGitHubBtn.style.display = 'inline-block';
+        if (saveAllMessage) saveAllMessage.style.display = 'none';
     } else {
         tokenInput.value = '';
         tokenStatusText.textContent = 'Not configured';
         tokenStatusText.parentElement.style.backgroundColor = '#f8d7da';
         tokenStatusText.parentElement.style.color = '#721c24';
         saveToGitHubBtn.style.display = 'none';
+        if (saveAllMessage) saveAllMessage.style.display = 'block';
     }
 }
 
