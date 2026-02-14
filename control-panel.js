@@ -17,8 +17,19 @@
 // - At least 12 characters long
 // - Not dictionary words or personal information
 //
-// Current password hash
-const PASSWORD_HASH = '751d3802f3db8cd910f2a6cacbbf1faf820b218cb8c3c0dd6a06188ce737c5c2'; // Password: &Can1989non
+// Default password hash (initial password)
+const DEFAULT_PASSWORD_HASH = '751d3802f3db8cd910f2a6cacbbf1faf820b218cb8c3c0dd6a06188ce737c5c2'; // Password: &Can1989non
+
+// Get current password hash (checks localStorage first, then falls back to default)
+function getPasswordHash() {
+    const storedHash = localStorage.getItem('controlPanelPasswordHash');
+    return storedHash || DEFAULT_PASSWORD_HASH;
+}
+
+// Set new password hash
+function setPasswordHash(hash) {
+    localStorage.setItem('controlPanelPasswordHash', hash);
+}
 
 // Simple SHA-256 hashing function (client-side)
 async function sha256(message) {
@@ -60,13 +71,23 @@ async function checkPassword() {
         return;
     }
     
+    // Get current password hash
+    const currentPasswordHash = getPasswordHash();
+    
     // Debug logging (check browser console)
     console.log('Entered password:', password);
     console.log('Entered password hash:', hash);
-    console.log('Expected hash:', PASSWORD_HASH);
-    console.log('Hashes match:', hash === PASSWORD_HASH);
+    console.log('Expected hash:', currentPasswordHash);
+    console.log('Hashes match:', hash === currentPasswordHash);
     
-    if (hash === PASSWORD_HASH) {
+    if (hash === currentPasswordHash) {
+        // Check if using default password - prompt to change
+        if (hash === DEFAULT_PASSWORD_HASH) {
+            // Using default password - prompt to change
+            showPasswordChangePrompt();
+            return;
+        }
+        
         // Correct password - show control panel
         loginForm.classList.add('hidden');
         controlPanel.classList.remove('hidden');
@@ -80,6 +101,93 @@ async function checkPassword() {
         passwordInput.value = '';
         passwordInput.focus();
     }
+}
+
+// Show password change prompt
+function showPasswordChangePrompt() {
+    const loginForm = document.getElementById('loginForm');
+    const passwordChangeModal = document.getElementById('passwordChangeModal');
+    
+    if (passwordChangeModal) {
+        passwordChangeModal.classList.remove('hidden');
+        document.getElementById('newPasswordInput').focus();
+    }
+}
+
+// Handle password change
+async function changePassword() {
+    const newPasswordInput = document.getElementById('newPasswordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+    const passwordChangeError = document.getElementById('passwordChangeError');
+    const passwordChangeModal = document.getElementById('passwordChangeModal');
+    const loginForm = document.getElementById('loginForm');
+    const controlPanel = document.getElementById('controlPanel');
+    
+    const newPassword = newPasswordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+    
+    // Clear previous errors
+    passwordChangeError.textContent = '';
+    passwordChangeError.classList.add('hidden');
+    
+    // Validate
+    if (!newPassword) {
+        passwordChangeError.textContent = 'Please enter a new password';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    if (newPassword.length < 8) {
+        passwordChangeError.textContent = 'Password must be at least 8 characters long';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        passwordChangeError.textContent = 'Passwords do not match';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    try {
+        // Hash new password
+        const newHash = await sha256(newPassword);
+        
+        // Save new password hash
+        setPasswordHash(newHash);
+        
+        // Hide modal and show control panel
+        passwordChangeModal.classList.add('hidden');
+        loginForm.classList.add('hidden');
+        controlPanel.classList.remove('hidden');
+        
+        // Clear password fields
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+        
+        // Load gallery data
+        loadGalleryData();
+        
+        // Show success message
+        alert('Password changed successfully! Your new password is now active.');
+    } catch (error) {
+        passwordChangeError.textContent = 'Error: ' + error.message;
+        passwordChangeError.classList.remove('hidden');
+    }
+}
+
+// Cancel password change (use default password)
+function cancelPasswordChange() {
+    const passwordChangeModal = document.getElementById('passwordChangeModal');
+    const loginForm = document.getElementById('loginForm');
+    const controlPanel = document.getElementById('controlPanel');
+    
+    passwordChangeModal.classList.add('hidden');
+    loginForm.classList.add('hidden');
+    controlPanel.classList.remove('hidden');
+    
+    // Load gallery data
+    loadGalleryData();
 }
 
 // Allow Enter key to submit login form
@@ -724,7 +832,7 @@ function copyJSON() {
     }
 }
 
-// Save JSON directly to GitHub (if token is configured)
+// Save JSON directly to GitHub (if token is configured) - NOW AUTOMATICALLY GENERATES HTML TOO
 async function saveJSONToGitHub() {
     const copyMessage = document.getElementById('copyMessage');
     
@@ -734,12 +842,37 @@ async function saveJSONToGitHub() {
     }
     
     try {
-        copyMessage.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Saving to GitHub... Please wait.</div>';
+        copyMessage.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Saving JSON and generating HTML files... Please wait.</div>';
+        
+        // Step 1: Save JSON
         await updateGalleryDataOnGitHub(galleryData);
-        copyMessage.innerHTML = '<div class="success-message">gallery-data.json successfully updated on GitHub!</div>';
+        
+        // Step 2: Automatically generate and save HTML files
+        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const htmlFiles = Object.keys(generatedHTMLs);
+        let savedCount = 0;
+        let errorCount = 0;
+        
+        for (const sectionId of htmlFiles) {
+            try {
+                const file = generatedHTMLs[sectionId];
+                await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
+                savedCount++;
+            } catch (error) {
+                console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
+                errorCount++;
+            }
+        }
+        
+        if (errorCount === 0) {
+            copyMessage.innerHTML = `<div class="success-message">✅ Successfully saved gallery-data.json and ${savedCount} HTML file(s) to GitHub!</div>`;
+        } else {
+            copyMessage.innerHTML = `<div class="success-message">✅ Saved gallery-data.json and ${savedCount} HTML file(s). ${errorCount} file(s) failed to save.</div>`;
+        }
+        
         setTimeout(() => {
             copyMessage.innerHTML = '';
-        }, 5000);
+        }, 8000);
     } catch (error) {
         copyMessage.innerHTML = `<div class="error-message">Failed to save to GitHub: ${error.message}. Please copy and commit manually.</div>`;
     }

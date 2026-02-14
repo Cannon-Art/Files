@@ -341,6 +341,28 @@
         </form>
     </div>
 
+    <!-- Password Change Modal (shown when using default password) -->
+    <div id="passwordChangeModal" class="panel-section hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 500px; width: 90%;">
+        <h2>Change Default Password</h2>
+        <p style="color: #666; margin-bottom: 1.5rem;">You're using the default password. For security, please set a new password.</p>
+        <form onsubmit="return false;">
+            <div class="form-group">
+                <label for="newPasswordInput">New Password</label>
+                <input type="password" id="newPasswordInput" required minlength="8" placeholder="At least 8 characters">
+                <small style="color: #666; display: block; margin-top: 0.25rem;">Minimum 8 characters</small>
+            </div>
+            <div class="form-group">
+                <label for="confirmPasswordInput">Confirm New Password</label>
+                <input type="password" id="confirmPasswordInput" required minlength="8" placeholder="Re-enter your new password">
+            </div>
+            <div id="passwordChangeError" class="error-message hidden"></div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-block" onclick="changePassword()">Change Password</button>
+                <button type="button" class="btn" onclick="cancelPasswordChange()" style="background-color: #6c757d;">Skip for Now</button>
+            </div>
+        </form>
+    </div>
+
     <!-- Control Panel (hidden until login) -->
     <div id="controlPanel" class="hidden">
         <div class="control-panel-container">
@@ -461,44 +483,41 @@
                 </div>
             </div>
 
-            <!-- JSON Export Section -->
+            <!-- Save All Changes Section (Combined JSON + HTML) -->
             <div class="panel-section">
-                <h2>Export JSON Data</h2>
-                <p>Copy the JSON below and commit it to <code>gallery-data.json</code> in your GitHub repository, or save directly if token is configured.</p>
-                <div id="jsonExport">
-                    <textarea id="jsonOutput" readonly></textarea>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                        <button type="button" class="btn" onclick="copyJSON()">Copy JSON to Clipboard</button>
-                        <button type="button" class="btn" onclick="saveJSONToGitHub()" id="saveToGitHubBtn" style="display: none;">Save to GitHub</button>
-                    </div>
-                    <div id="copyMessage" style="margin-top: 0.5rem;"></div>
-                </div>
-            </div>
-
-            <!-- HTML Generation Section -->
-            <div class="panel-section">
-                <h2>Generate Gallery HTML Pages</h2>
-                <p>Automatically generate HTML files for all gallery sections from the current JSON data. This will create/update:</p>
-                <ul style="margin: 1rem 0; padding-left: 2rem;">
-                    <li><code>dc-characters.html</code></li>
-                    <li><code>marvel-characters.html</code></li>
-                    <li><code>music-legends.html</code></li>
-                    <li><code>recovery-art.html</code></li>
-                    <li><code>miscellaneous.html</code></li>
-                </ul>
+                <h2>Save All Changes</h2>
+                <p><strong>One-click save:</strong> This will automatically save your JSON data and generate/update all HTML gallery pages.</p>
                 <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-                    <strong>Note:</strong> HTML generation includes all SEO meta tags, structured data, and proper formatting. 
-                    Files will be saved directly to GitHub if token is configured, or you can copy the HTML manually.
+                    When you click "Save All to GitHub", the system will:
                 </p>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button type="button" class="btn" onclick="generateAllHTML()">Generate All HTML Files</button>
-                    <button type="button" class="btn" onclick="previewGeneratedHTML()">Preview Generated HTML</button>
+                <ul style="margin: 1rem 0; padding-left: 2rem; color: #666;">
+                    <li>Save <code>gallery-data.json</code> with your current changes</li>
+                    <li>Automatically generate and save all HTML files:
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li><code>dc-characters.html</code></li>
+                            <li><code>marvel-characters.html</code></li>
+                            <li><code>music-legends.html</code></li>
+                            <li><code>recovery-art.html</code></li>
+                            <li><code>miscellaneous.html</code></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-block" onclick="saveJSONToGitHub()" id="saveToGitHubBtn" style="display: none; font-size: 1.1rem; padding: 1rem;">💾 Save All to GitHub</button>
                 </div>
-                <div id="htmlGenerationMessage" style="margin-top: 1rem;"></div>
-                <div id="htmlPreviewSection" style="display: none; margin-top: 2rem;">
-                    <h3>Generated HTML Files</h3>
-                    <div id="htmlFilesList"></div>
-                </div>
+                <div id="copyMessage" style="margin-top: 1rem;"></div>
+                
+                <!-- Advanced Options (Collapsed by default) -->
+                <details style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e0e0e0;">
+                    <summary style="cursor: pointer; color: #666; font-size: 0.9rem;">Advanced: Manual Export Options</summary>
+                    <div style="margin-top: 1rem;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Export JSON Data</h3>
+                        <textarea id="jsonOutput" readonly style="width: 100%; min-height: 200px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85rem;"></textarea>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button type="button" class="btn" onclick="copyJSON()" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Copy JSON</button>
+                        </div>
+                    </div>
+                </details>
             </div>
         </div>
     </div>
