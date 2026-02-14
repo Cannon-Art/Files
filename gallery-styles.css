@@ -3,7 +3,7 @@
 /* Copyright Watermark Styles */
 .gallery-image-container::after,
 .collection-image-container::after {
-    content: '© 2025 Timmsy\'s Art';
+    content: '© 2026 Cannon Art';
     position: absolute;
     bottom: 10px;
     right: 10px;
@@ -95,7 +95,6 @@
     -khtml-user-drag: none;
     -moz-user-drag: none;
     -o-user-drag: none;
-    user-drag: none;
     pointer-events: auto;
 }
 
@@ -307,14 +306,13 @@
     -khtml-user-drag: none;
     -moz-user-drag: none;
     -o-user-drag: none;
-    user-drag: none;
     pointer-events: auto;
     display: block;
 }
 
 /* Copyright watermark for modal */
 .modal-image-container::after {
-    content: '© 2025 Timmsy\'s Art';
+    content: '© 2026 Cannon Art';
     position: absolute;
     bottom: 15px;
     right: 15px;
