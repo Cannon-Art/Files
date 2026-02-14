@@ -137,8 +137,30 @@ async function changePassword() {
         return;
     }
     
+    // Password policy validation
     if (newPassword.length < 8) {
         passwordChangeError.textContent = 'Password must be at least 8 characters long';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    // Check for capital letter
+    if (!/[A-Z]/.test(newPassword)) {
+        passwordChangeError.textContent = 'Password must contain at least one capital letter';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    // Check for number
+    if (!/[0-9]/.test(newPassword)) {
+        passwordChangeError.textContent = 'Password must contain at least one number';
+        passwordChangeError.classList.remove('hidden');
+        return;
+    }
+    
+    // Check for special character (! @ # $ % ^ & * ( ) _ +)
+    if (!/[!@#$%^&*()_+]/.test(newPassword)) {
+        passwordChangeError.textContent = 'Password must contain at least one special character (! @ # $ % ^ & * ( ) _ +)';
         passwordChangeError.classList.remove('hidden');
         return;
     }
