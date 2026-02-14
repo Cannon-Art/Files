@@ -8,6 +8,14 @@
         "medium": "Oil",
         "notes": "This is the 2nd test",
         "year": ""
+      },
+      {
+        "id": "dc-002",
+        "name": "Test Number 1#",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/test_number_1_.JPG",
+        "medium": "Oil",
+        "notes": "This is the 2nd test",
+        "year": ""
       }
     ],
     "marvel-characters": [],
