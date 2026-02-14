@@ -1,0 +1,12 @@
+# robots.txt for Cannon Art Gallery
+
+User-agent: *
+Allow: /
+
+# Disallow unnecessary files
+Disallow: /Archive/
+
+# Sitemap location
+Sitemap: https://cannon-art.github.io/Files/sitemap.xml
+
+
