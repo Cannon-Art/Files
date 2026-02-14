@@ -641,12 +641,36 @@ async function addPicture() {
     }
     galleryData.sections[section].push(newPicture);
     
-    // Try to update gallery-data.json on GitHub (if token is configured)
+    // Try to update gallery-data.json and HTML files on GitHub (if token is configured)
     if (hasGitHubToken()) {
         try {
-            messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem; background-color: #d4edda; border-radius: 4px;">Updating gallery-data.json on GitHub... Please wait.</div>';
+            messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem; background-color: #d4edda; border-radius: 4px;">Saving JSON and generating HTML files... Please wait.</div>';
+            
+            // Step 1: Update JSON
             await updateGalleryDataOnGitHub(galleryData);
-            messageDiv.innerHTML = '<div class="success-message">Picture added and gallery-data.json updated on GitHub successfully!</div>';
+            
+            // Step 2: Generate and save HTML files
+            const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+            const htmlFiles = Object.keys(generatedHTMLs);
+            let savedCount = 0;
+            let errorCount = 0;
+            
+            for (const sectionId of htmlFiles) {
+                try {
+                    const file = generatedHTMLs[sectionId];
+                    await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
+                    savedCount++;
+                } catch (error) {
+                    console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
+                    errorCount++;
+                }
+            }
+            
+            if (errorCount === 0) {
+                messageDiv.innerHTML = `<div class="success-message">✅ Picture added! Saved gallery-data.json and ${savedCount} HTML file(s) to GitHub.</div>`;
+            } else {
+                messageDiv.innerHTML = `<div class="success-message">✅ Picture added! Saved gallery-data.json and ${savedCount} HTML file(s). ${errorCount} file(s) failed.</div>`;
+            }
         } catch (error) {
             messageDiv.innerHTML = `<div class="error-message">Picture added locally, but failed to update GitHub: ${error.message}. Please copy the JSON below and commit manually.</div>`;
         }
