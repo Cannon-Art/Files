@@ -16,14 +16,31 @@ The control panel now supports direct file uploads to GitHub! When you select an
 6. Click **"Generate token"**
 7. **IMPORTANT:** Copy the token immediately - you won't be able to see it again!
 
-### Step 2: Configure Token in Control Panel
+### Step 2: Share Token with Team Members (Recommended for Non-Technical Users)
+
+**For teams with non-technical users, we recommend one person creates the token and shares it securely:**
+
+1. **Token Creator:** Create the token following Step 1 above
+2. **Share Securely:** Share the token with team members via:
+   - Password manager (recommended)
+   - Secure messaging app
+   - Encrypted email
+   - **Never** share via unsecured channels or commit to GitHub
+3. **Each User:** Each team member needs to configure it once in their browser (see Step 3)
+
+**Note:** This is a one-time setup per browser. Once saved, users won't need to enter it again unless they clear browser data or use a different device.
+
+### Step 3: Configure Token in Control Panel (Each User)
+
+**Each user needs to do this once in their own browser:**
 
 1. Open the control panel: `https://cannon-art.github.io/Files/control-panel.html`
 2. Login with your password
 3. Scroll to the **"Settings"** section
-4. Paste your GitHub token into the **"GitHub Personal Access Token"** field
+4. Paste the shared GitHub token into the **"GitHub Personal Access Token"** field
 5. Click **"Save Token"**
 6. The token is now stored in your browser's localStorage (only on your device)
+7. You're done! The token will stay saved for future sessions.
 
 ## How It Works
 
@@ -52,10 +69,14 @@ The control panel now supports direct file uploads to GitHub! When you select an
 
 ## Security Notes
 
-- **Token Storage:** The token is stored in your browser's localStorage only (not in the code)
+- **Token Storage:** The token is stored in each user's browser localStorage only (not in the code or files)
 - **Token Scope:** The token only needs `repo` scope - it can read/write files in your repository
-- **Token Security:** Never share your token or commit it to GitHub
-- **Token Rotation:** You can regenerate tokens periodically for security
+- **Shared Token Approach:** For non-technical teams, one person creates the token and shares it securely with team members. This is the recommended approach.
+- **Token Security:** 
+  - Never commit tokens to GitHub or documentation files
+  - Share tokens only via secure channels (password manager, encrypted messaging)
+  - If a token is ever exposed, revoke it immediately and create a new one
+- **Token Rotation:** You can regenerate tokens periodically for security (team members will need to update their saved token)
 
 ## Troubleshooting
 
