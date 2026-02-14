@@ -1127,6 +1127,61 @@ function previewGeneratedHTML() {
     generateAllHTML();
 }
 
+// Regenerate all HTML files and save to GitHub
+async function regenerateAllHTML() {
+    const messageDiv = document.getElementById('regenerateMessage');
+    const btn = document.getElementById('regenerateHTMLBtn');
+    
+    if (!hasGitHubToken()) {
+        messageDiv.innerHTML = '<div class="error-message">GitHub token not configured. Please set it in Settings first.</div>';
+        return;
+    }
+    
+    if (!galleryData || !galleryData.sections) {
+        messageDiv.innerHTML = '<div class="error-message">No gallery data loaded. Please refresh the page.</div>';
+        return;
+    }
+    
+    try {
+        btn.disabled = true;
+        btn.textContent = 'Regenerating... Please wait';
+        messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Regenerating all HTML files from current JSON... Please wait.</div>';
+        
+        // Generate HTML for all sections
+        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const htmlFiles = Object.keys(generatedHTMLs);
+        let savedCount = 0;
+        let errorCount = 0;
+        
+        for (const sectionId of htmlFiles) {
+            try {
+                const file = generatedHTMLs[sectionId];
+                await updateGitHubFile(file.filename, file.html, `Regenerate ${file.filename} from control panel`);
+                savedCount++;
+            } catch (error) {
+                console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
+                errorCount++;
+            }
+        }
+        
+        if (errorCount === 0) {
+            messageDiv.innerHTML = `<div class="success-message">✅ Successfully regenerated and saved ${savedCount} HTML file(s) to GitHub!</div>`;
+        } else {
+            messageDiv.innerHTML = `<div class="success-message">✅ Regenerated ${savedCount} HTML file(s). ${errorCount} file(s) failed to save.</div>`;
+        }
+        
+        setTimeout(() => {
+            messageDiv.innerHTML = '';
+        }, 8000);
+    } catch (error) {
+        messageDiv.innerHTML = `<div class="error-message">Error regenerating HTML: ${error.message}</div>`;
+        console.error('HTML regeneration error:', error);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Regenerate All HTML Files';
+    }
+}
+
 // Copy HTML to clipboard
 function copyHTMLToClipboard(sectionId) {
     if (!window.generatedHTMLs || !window.generatedHTMLs[sectionId]) {
