@@ -473,9 +473,36 @@
                     <div id="copyMessage" style="margin-top: 0.5rem;"></div>
                 </div>
             </div>
+
+            <!-- HTML Generation Section -->
+            <div class="panel-section">
+                <h2>Generate Gallery HTML Pages</h2>
+                <p>Automatically generate HTML files for all gallery sections from the current JSON data. This will create/update:</p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><code>dc-characters.html</code></li>
+                    <li><code>marvel-characters.html</code></li>
+                    <li><code>music-legends.html</code></li>
+                    <li><code>recovery-art.html</code></li>
+                    <li><code>miscellaneous.html</code></li>
+                </ul>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                    <strong>Note:</strong> HTML generation includes all SEO meta tags, structured data, and proper formatting. 
+                    Files will be saved directly to GitHub if token is configured, or you can copy the HTML manually.
+                </p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button type="button" class="btn" onclick="generateAllHTML()">Generate All HTML Files</button>
+                    <button type="button" class="btn" onclick="previewGeneratedHTML()">Preview Generated HTML</button>
+                </div>
+                <div id="htmlGenerationMessage" style="margin-top: 1rem;"></div>
+                <div id="htmlPreviewSection" style="display: none; margin-top: 2rem;">
+                    <h3>Generated HTML Files</h3>
+                    <div id="htmlFilesList"></div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="html-generator.js"></script>
     <script src="control-panel.js"></script>
 </body>
 </html>

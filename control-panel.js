@@ -755,3 +755,204 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// ============================================================================
+// HTML GENERATION
+// ============================================================================
+
+// Generate all HTML files from current gallery data
+async function generateAllHTML() {
+    const messageDiv = document.getElementById('htmlGenerationMessage');
+    const previewSection = document.getElementById('htmlPreviewSection');
+    const filesList = document.getElementById('htmlFilesList');
+    
+    if (!galleryData || !galleryData.sections) {
+        messageDiv.innerHTML = '<div class="error-message">No gallery data loaded. Please refresh the page.</div>';
+        return;
+    }
+    
+    try {
+        messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Generating HTML files... Please wait.</div>';
+        
+        // Generate HTML for all sections
+        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const fileCount = Object.keys(generatedHTMLs).length;
+        
+        // Display preview
+        let filesHTML = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+        Object.keys(generatedHTMLs).forEach(sectionId => {
+            const file = generatedHTMLs[sectionId];
+            filesHTML += `
+                <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 4px;">
+                    <h4 style="margin: 0 0 0.5rem 0; color: #169B62;">${file.filename}</h4>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button type="button" class="btn" onclick="copyHTMLToClipboard('${sectionId}')" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Copy HTML</button>
+                        <button type="button" class="btn" onclick="saveHTMLToGitHub('${sectionId}')" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Save to GitHub</button>
+                    </div>
+                </div>`;
+        });
+        filesHTML += '</div>';
+        
+        filesList.innerHTML = filesHTML;
+        previewSection.style.display = 'block';
+        
+        // Store generated HTMLs globally for access by copy/save functions
+        window.generatedHTMLs = generatedHTMLs;
+        
+        messageDiv.innerHTML = `<div class="success-message">Successfully generated ${fileCount} HTML file(s)! Use the buttons below to copy or save to GitHub.</div>`;
+        
+    } catch (error) {
+        messageDiv.innerHTML = `<div class="error-message">Error generating HTML: ${error.message}</div>`;
+        console.error('HTML generation error:', error);
+    }
+}
+
+// Preview generated HTML (same as generate, but shows in modal/textarea)
+function previewGeneratedHTML() {
+    generateAllHTML();
+}
+
+// Copy HTML to clipboard
+function copyHTMLToClipboard(sectionId) {
+    if (!window.generatedHTMLs || !window.generatedHTMLs[sectionId]) {
+        alert('Please generate HTML files first.');
+        return;
+    }
+    
+    const html = window.generatedHTMLs[sectionId].html;
+    const textarea = document.createElement('textarea');
+    textarea.value = html;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    
+    try {
+        document.execCommand('copy');
+        alert(`HTML for ${sectionId}.html copied to clipboard!`);
+    } catch (err) {
+        alert('Failed to copy. Please select and copy manually.');
+    }
+    
+    document.body.removeChild(textarea);
+}
+
+// Save HTML file to GitHub
+async function saveHTMLToGitHub(sectionId) {
+    if (!window.generatedHTMLs || !window.generatedHTMLs[sectionId]) {
+        alert('Please generate HTML files first.');
+        return;
+    }
+    
+    if (!hasGitHubToken()) {
+        alert('GitHub token not configured. Please set it in Settings first.');
+        return;
+    }
+    
+    const file = window.generatedHTMLs[sectionId];
+    const messageDiv = document.getElementById('htmlGenerationMessage');
+    
+    try {
+        messageDiv.innerHTML = `<div style="color: #169B62; padding: 0.75rem;">Saving ${file.filename} to GitHub... Please wait.</div>`;
+        
+        await updateGitHubFile(file.filename, file.html, `Update ${file.filename} from control panel`);
+        
+        messageDiv.innerHTML = `<div class="success-message">${file.filename} successfully saved to GitHub!</div>`;
+        setTimeout(() => {
+            messageDiv.innerHTML = '';
+        }, 5000);
+    } catch (error) {
+        messageDiv.innerHTML = `<div class="error-message">Failed to save ${file.filename}: ${error.message}</div>`;
+    }
+}
+
+// Helper function to use the HTML generator (from html-generator.js)
+function generateAllGalleryHTMLs(galleryData) {
+    // Use the function from html-generator.js if available
+    if (typeof window !== 'undefined' && window.generateAllGalleryHTMLs) {
+        return window.generateAllGalleryHTMLs(galleryData);
+    }
+    
+    // Fallback: implement inline if html-generator.js didn't load
+    const results = {};
+    const SECTION_METADATA = {
+        'dc-characters': {
+            title: 'DC Characters Collection - Batman & Joker Art | Cannon Art',
+            heroTitle: 'DC Characters',
+            heroSubtitle: 'Batman, The Joker, and the heroes and villains of the DC Universe',
+            description: [
+                'This collection explores the iconic characters of the DC Universe, focusing on the eternal struggle between Batman and The Joker. Each piece captures the duality of heroism and villainy that defines these legendary characters.',
+                'The artworks blend traditional comic book aesthetics with contemporary artistic techniques, creating a unique visual narrative that honors the legacy of DC\'s most beloved characters.'
+            ],
+            keywords: 'DC characters, Batman art, Joker art, DC Universe, comic book art, superhero art, villain art, Batman vs Joker, Heath Ledger Joker, contemporary art, mixed media',
+            ogDescription: 'Explore Cannon DC Characters collection featuring Batman, The Joker, and iconic DC Universe heroes and villains.'
+        },
+        'marvel-characters': {
+            title: 'Marvel Characters Collection - Superhero Art | Cannon Art',
+            heroTitle: 'Marvel Characters',
+            heroSubtitle: 'Heroes and villains from the Marvel Universe',
+            description: [
+                'This collection will feature iconic characters from the Marvel Universe. Stay tuned for new artwork celebrating the heroes and villains that have captivated audiences for generations.'
+            ],
+            keywords: 'Marvel characters, superhero art, X-Men, Avengers, comic book art, Marvel Universe, contemporary art, mixed media',
+            ogDescription: 'Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.'
+        },
+        'music-legends': {
+            title: 'Music Legends Collection - Rock & Roll Art | Cannon Art',
+            heroTitle: 'Music Legends',
+            heroSubtitle: 'Celebrating the icons of rock and roll history',
+            description: [
+                'This collection pays tribute to the legendary rock bands that defined generations. From The Rolling Stones\' timeless rock and roll energy to The Who\'s pioneering rock opera innovations, each piece captures the spirit and influence of these musical icons.',
+                'The mixed media artworks blend contemporary techniques with the raw energy of rock music, creating visual tributes that honor their legendary status and enduring appeal across generations.'
+            ],
+            keywords: 'music legends, rock and roll art, The Rolling Stones, The Who, music art, contemporary art, mixed media, rock music',
+            ogDescription: 'Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.'
+        },
+        'recovery-art': {
+            title: 'Recovery Art Collection - Hope & Transformation | Cannon Art',
+            heroTitle: 'Recovery Art',
+            heroSubtitle: 'Artwork inspired by themes of recovery, hope, and personal transformation',
+            description: [
+                'This collection will feature artwork inspired by themes of recovery, hope, and personal transformation. Each piece will explore the journey of healing and the power of resilience.'
+            ],
+            keywords: 'recovery art, addiction recovery, hope, transformation, healing art, contemporary art, mixed media, personal growth',
+            ogDescription: 'Explore Cannon Recovery Art collection featuring artwork inspired by themes of recovery, hope, and personal transformation.'
+        },
+        'miscellaneous': {
+            title: 'Miscellaneous Collection - Diverse Creative Expressions | Cannon Art',
+            heroTitle: 'Miscellaneous',
+            heroSubtitle: 'A diverse collection of creative expressions',
+            description: [
+                'This collection features a diverse range of creative expressions that don\'t fit into a single category. Each piece represents a unique artistic vision and creative exploration.'
+            ],
+            keywords: 'miscellaneous art, diverse art, creative expressions, contemporary art, mixed media, unique artwork',
+            ogDescription: 'Explore Cannon Miscellaneous collection featuring diverse creative expressions and unique artwork.'
+        }
+    };
+    
+    Object.keys(galleryData.sections).forEach(sectionId => {
+        const pictures = galleryData.sections[sectionId] || [];
+        const metadata = SECTION_METADATA[sectionId];
+        
+        if (!metadata) {
+            console.warn(`No metadata found for section: ${sectionId}`);
+            return;
+        }
+        
+        // Use the generateGalleryHTML function from html-generator.js if available
+        if (typeof window !== 'undefined' && window.generateGalleryHTML) {
+            results[sectionId] = {
+                filename: `${sectionId}.html`,
+                html: window.generateGalleryHTML(sectionId, pictures, metadata)
+            };
+        } else {
+            // Fallback: return empty (shouldn't happen if html-generator.js loads)
+            results[sectionId] = {
+                filename: `${sectionId}.html`,
+                html: '<!-- HTML generator not loaded. Please refresh the page. -->'
+            };
+        }
+    });
+    
+    return results;
+}

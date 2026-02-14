@@ -60,13 +60,35 @@ The default password is: `password`
 5. Paste the copied JSON (replace entire file)
 6. Commit and push to GitHub
 
+## Generating HTML Gallery Pages
+
+**NEW FEATURE:** The control panel can now automatically generate HTML files for all gallery sections!
+
+1. After updating your gallery data (JSON), scroll to the **"Generate Gallery HTML Pages"** section
+2. Click **"Generate All HTML Files"**
+3. The system will generate HTML for:
+   - `dc-characters.html`
+   - `marvel-characters.html`
+   - `music-legends.html`
+   - `recovery-art.html`
+   - `miscellaneous.html`
+4. For each generated file, you can:
+   - **Copy HTML** - Copy the HTML to your clipboard for manual commit
+   - **Save to GitHub** - Directly save the file to GitHub (requires token configured)
+
+**What's Included:**
+- All SEO meta tags and structured data
+- Proper navigation and header/footer
+- Gallery grid with all images from JSON
+- Notes expansion/collapse functionality
+- Full-size image viewer modals
+- All security scripts (protection.js, canvas-protection.js)
+
+**Important:** Always generate HTML after updating the JSON data to keep the website in sync!
+
 ## Important Notes
 
-- **No Automatic HTML Generation:** The control panel manages the JSON data only. You'll need to either:
-  - Manually update the HTML gallery pages, OR
-  - Create a script to generate HTML from the JSON (future enhancement)
-
-- **Image Upload:** The file picker in the control panel is for reference only. You must manually upload images to GitHub and provide the URL.
+- **Image Upload:** You can now upload images directly from the control panel if you have a GitHub Personal Access Token configured. Otherwise, manually upload to GitHub and provide the URL.
 
 - **Session Security:** The password check is client-side only. For production, consider additional security measures if needed.
 
