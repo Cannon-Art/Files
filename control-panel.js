@@ -1236,15 +1236,19 @@ async function saveHTMLToGitHub(sectionId) {
     }
 }
 
-// Store reference to html-generator.js function BEFORE defining our wrapper
-// This prevents infinite recursion when our wrapper overwrites window.generateAllGalleryHTMLs
-const htmlGeneratorGenerateAll = typeof window !== 'undefined' ? window.generateAllGalleryHTMLs : null;
+// Store the original function from html-generator.js BEFORE we define our wrapper
+// Use an IIFE to capture it immediately when this script loads
+const htmlGeneratorFn = (function() {
+    // Capture the function from html-generator.js before control-panel.js defines its own
+    return typeof window !== 'undefined' && window.generateAllGalleryHTMLs ? window.generateAllGalleryHTMLs : null;
+})();
 
 // Helper function to use the HTML generator (from html-generator.js)
+// This wrapper will be called by control-panel.js code, but it delegates to the original
 function generateAllGalleryHTMLs(galleryData) {
-    // Use the function from html-generator.js if available (stored before we overwrote it)
-    if (htmlGeneratorGenerateAll && typeof htmlGeneratorGenerateAll === 'function') {
-        return htmlGeneratorGenerateAll(galleryData);
+    // Always use the original function from html-generator.js if available
+    if (htmlGeneratorFn && typeof htmlGeneratorFn === 'function') {
+        return htmlGeneratorFn(galleryData);
     }
     
     // Fallback: implement inline if html-generator.js didn't load
