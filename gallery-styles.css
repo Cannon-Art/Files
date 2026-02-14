@@ -162,7 +162,7 @@
     line-height: 1.6;
     margin-bottom: 0;
     font-style: italic;
-    font-family: 'Bookman Old Style', 'Book Antiqua', 'Palatino Linotype', serif;
+    font-family: Arial, Calibri, 'Helvetica Neue', Helvetica, sans-serif;
     display: inline;
 }
 
@@ -198,7 +198,7 @@
     font-style: normal;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: 'Bookman Old Style', 'Book Antiqua', 'Palatino Linotype', serif;
+    font-family: Arial, Calibri, 'Helvetica Neue', Helvetica, sans-serif;
     text-transform: lowercase;
     letter-spacing: 0;
     text-decoration: none;
