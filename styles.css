@@ -319,6 +319,8 @@ body {
     overflow: hidden;
     aspect-ratio: 4/3;
     background-color: #f8f9fa;
+    display: block;
+    width: 100%;
 }
 
 .collection-image {
@@ -326,6 +328,10 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .collection-item:hover .collection-image {
