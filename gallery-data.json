@@ -1,0 +1,69 @@
+{
+  "sections": {
+    "dc-characters": [
+      {
+        "id": "dc-001",
+        "name": "The Joker - Multiple Expressions",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Marvel_Pic10.JPEG",
+        "medium": "Mixed Media",
+        "notes": "This picture shows different versions of the same character, \"The Joker\", each with a different expression. Together, they suggest a mind that is split and unsettled. The repeated laughing in the background gives a feeling of noise and pressure, like thoughts that won't quiet down and keep mocking or pushing from inside.\n\nLooking at each portrayal of the Joker character, the image reflects someone struggling with their own darker thoughts and behaviours. Each face represents a different side of that struggle—anger, false confidence, loss of control, or emotional numbness. Instead of being one clear, steady person, they appear pulled in different directions by these inner voices. The picture shows how losing a sense of self can feel confusing and overwhelming, as if the person is surrounded by versions of themselves that make it harder to stay grounded or at peace.",
+        "year": "2026"
+      },
+      {
+        "id": "dc-002",
+        "name": "The Joker",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/The_Joker.JPG",
+        "medium": "Mixed Media",
+        "notes": "",
+        "year": "2026"
+      }
+    ],
+    "marvel-characters": [
+      {
+        "id": "marvel-001",
+        "name": "Storm and Wolverine",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Storm_and_Wolverine.JPG",
+        "medium": "Mixed Media",
+        "notes": "",
+        "year": "2026"
+      }
+    ],
+    "music-legends": [],
+    "recovery-art": [
+      {
+        "id": "recovery-001",
+        "name": "Escape from the Clutches of Addiction",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Recovery_5.JPEG",
+        "medium": "Mixed Media",
+        "notes": "This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction's constant pull—its pressure, control, and refusal to let go. The figure turning forward and opening their mouth reflects an act of resistance: a choice to speak, to breathe, and to move in a different direction. The words \"This way to escape the clutches of addiction\" point toward hope, though not an easy escape—one that demands effort, pain, and determination. It captures a transition in which addiction is still present but no longer in control, and where reclaiming one's voice and direction marks the first step toward a life without addiction.",
+        "year": "2026"
+      },
+      {
+        "id": "recovery-002",
+        "name": "HELP!!",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/HELP!!.JPG",
+        "medium": "Mixed Media",
+        "notes": "",
+        "year": "2026"
+      }
+    ],
+    "miscellaneous": [
+      {
+        "id": "misc-001",
+        "name": "Stingy Jack",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Stingy_Jack.JPEG",
+        "medium": "Mixed Media",
+        "notes": "Stingy Jack was a drunkard long ago. It was said that Jack was a beastly man, even beastlier than the devil himself – a rumour that greatly annoyed the devil. Outraged and envious, the devil came to Jack one night to collect his soul and take him to hell. Jack was cunning however, and he managed to trick the devil.\n\nAs a last request, Jack asked the devil to pick an apple from a tree for him. The devil, seeing no problem with this, climbed up the tree to pick an apple for Jack. As soon as the devil was up in the tree however, Jack quickly placed a ring of crucifixes around it, trapping the devil.\n\nFurious, the devil demanded to be set free immediately. Jack cockily countered that he would only let him go provided that his soul would never go to hell. The devil acceded to his condition and Jack set him free.\n\nWhen Stingy Jack eventually died years later, he wasn't admitted into heaven due to all the sins he had committed during his life. When he reached the gates of hell, the devil wouldn't accept his soul either, staying true to the promise he had made. However, he took pity on poor Jack and tossed him a coal from hell to make a lantern for himself.\n\nErgo, Jack's soul was condemned to purgatory, to live out his immortality alone in the plane between heaven and hell, with nothing but a hollowed-out turnip lit with the coal the devil had given him to light his way. And so from that point on Stingy Jack was given the nickname Jack O' Lantern, or 'Seán na Gealaí'.\n\nWhenever a will-o'-the-wisp was spotted at night it was believed to be Seán na Gealaí walking around with his lighted turnip. It became tradition for people, like Seán na Gealaí, to create lanterns of their own out of turnips and carve horrible faces into them to scare off any evil spirits. This custom carries on to this day, but with pumpkins in the place of turnips as they're much easier to carve.\n\nNow, the next time they run out of pumpkin spice lattes at the café, maybe you should take a moment to think of poor Seán na Gealaí, and remember that you don't have it nearly as bad as him!\n\nSource: https://www.gaelchultur.com/en/blog/the-origin-of-the-jack-o-lantern",
+        "year": "2026"
+      },
+      {
+        "id": "misc-002",
+        "name": "Butterfly Tattoo",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Butterfly_Tattoo.JPG",
+        "medium": "Mixed Media",
+        "notes": "",
+        "year": "2026"
+      }
+    ]
+  }
+}

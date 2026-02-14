@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel - Cannon Art</title>
+    <link rel="stylesheet" href="styles.css?v=9">
+    <style>
+        /* Control Panel Specific Styles */
+        body {
+            padding-top: 80px;
+            background-color: #f5f5f5;
+        }
+
+        .control-panel-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .panel-header {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .panel-header h1 {
+            color: #169B62;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-section {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .panel-section h2 {
+            color: #169B62;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #169B62;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Login Form Styles */
+        #loginForm {
+            max-width: 400px;
+            margin: 5rem auto;
+            background-color: #fff;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        #loginForm h2 {
+            color: #169B62;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #169B62;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background-color: #169B62;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #13804f;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Add Picture Form */
+        #addPictureForm {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Picture List */
+        .pictures-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .picture-item {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .picture-item.editing {
+            border-color: #169B62;
+            background-color: #f0f8f5;
+        }
+
+        .picture-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .picture-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 2px solid #ddd;
+        }
+
+        .picture-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editable-field {
+            margin-bottom: 1rem;
+        }
+
+        .editable-field label {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .editable-field input,
+        .editable-field select,
+        .editable-field textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .editable-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* JSON Export Section */
+        #jsonExport {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        #jsonOutput {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            background-color: #fff;
+            resize: vertical;
+        }
+
+        .section-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .section-tab {
+            padding: 0.5rem 1rem;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .section-tab.active {
+            background-color: #169B62;
+            color: #fff;
+        }
+
+        .section-tab:hover {
+            background-color: #ccc;
+        }
+
+        .section-tab.active:hover {
+            background-color: #13804f;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* File Upload */
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: #169B62;
+            background-color: #f0f8f5;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form (shown initially) -->
+    <div id="loginForm" class="panel-section">
+        <h2>Admin Login</h2>
+        <form id="loginFormElement" onsubmit="return false;">
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" id="passwordInput" required autofocus>
+            </div>
+            <button type="button" class="btn btn-block" onclick="checkPassword()">Login</button>
+            <div id="loginError" class="error-message hidden"></div>
+        </form>
+    </div>
+
+    <!-- Control Panel (hidden until login) -->
+    <div id="controlPanel" class="hidden">
+        <div class="control-panel-container">
+            <div class="panel-header">
+                <h1>Cannon Art - Control Panel</h1>
+                <p>Manage gallery images and content</p>
+            </div>
+
+            <!-- Add New Picture Section -->
+            <div class="panel-section">
+                <h2>Add New Picture</h2>
+                <form id="addPictureForm">
+                    <div class="form-group">
+                        <label for="imageFile">Image File *</label>
+                        <div class="file-upload-wrapper">
+                            <label for="imageFile" class="file-upload-label">
+                                Click to select image file
+                            </label>
+                            <input type="file" id="imageFile" class="file-upload-input" accept="image/*" required>
+                            <div id="fileName" class="file-name"></div>
+                        </div>
+                        <small style="color: #666; margin-top: 0.5rem; display: block;">
+                            Select an image file to upload directly to GitHub. The Image URL will be auto-generated after upload.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pictureName">Picture Name *</label>
+                        <input type="text" id="pictureName" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pictureSection">Section *</label>
+                            <select id="pictureSection" required>
+                                <option value="">Select a section...</option>
+                                <option value="dc-characters">DC Characters</option>
+                                <option value="marvel-characters">Marvel Characters</option>
+                                <option value="music-legends">Music Legends</option>
+                                <option value="recovery-art">Recovery Art</option>
+                                <option value="miscellaneous">Miscellaneous</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pictureMedium">Medium *</label>
+                            <select id="pictureMedium" required>
+                                <option value="">Select medium...</option>
+                                <option value="Oil">Oil</option>
+                                <option value="Watercolour">Watercolour</option>
+                                <option value="Acrylic">Acrylic</option>
+                                <option value="Pencil">Pencil</option>
+                                <option value="Mixed Media">Mixed Media</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="imageUrl">Image URL <span id="imageUrlRequired">*</span></label>
+                            <input type="text" id="imageUrl" placeholder="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/... (auto-filled if uploading file)">
+                            <small style="color: #666; margin-top: 0.25rem; display: block;">
+                                Required if not uploading a file. Auto-filled if uploading.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pictureYear">Year (optional)</label>
+                            <input type="text" id="pictureYear" placeholder="2026">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pictureNotes">Notes (optional)</label>
+                        <textarea id="pictureNotes" lang="en" spellcheck="true" placeholder="Enter notes about this artwork..."></textarea>
+                    </div>
+
+                    <button type="button" class="btn btn-block" onclick="addPicture()">Add Picture</button>
+                    <div id="addPictureMessage"></div>
+                </form>
+            </div>
+
+            <!-- Edit Existing Pictures Section -->
+            <div class="panel-section">
+                <h2>Edit Existing Pictures</h2>
+                
+                <div class="section-tabs">
+                    <button class="section-tab active" onclick="showSection('all')">All Sections</button>
+                    <button class="section-tab" onclick="showSection('dc-characters')">DC Characters</button>
+                    <button class="section-tab" onclick="showSection('marvel-characters')">Marvel Characters</button>
+                    <button class="section-tab" onclick="showSection('music-legends')">Music Legends</button>
+                    <button class="section-tab" onclick="showSection('recovery-art')">Recovery Art</button>
+                    <button class="section-tab" onclick="showSection('miscellaneous')">Miscellaneous</button>
+                </div>
+
+                <div id="picturesList" class="pictures-list">
+                    <!-- Pictures will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="panel-section">
+                <h2>Settings</h2>
+                <div class="form-group">
+                    <label for="githubToken">GitHub Personal Access Token</label>
+                    <input type="password" id="githubToken" placeholder="Enter GitHub token to enable direct uploads" value="">
+                    <small style="color: #666; margin-top: 0.5rem; display: block;">
+                        <strong>Required for direct file uploads.</strong> Create a token at 
+                        <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Developer settings → Personal access tokens</a>.
+                        Token needs <code>repo</code> scope. Token is stored in browser localStorage only.
+                    </small>
+                    <button type="button" class="btn" onclick="saveGitHubToken()" style="margin-top: 1rem;">Save Token</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearGitHubToken()" style="margin-top: 1rem; margin-left: 0.5rem;">Clear Token</button>
+                    <div id="tokenMessage" style="margin-top: 0.5rem;"></div>
+                </div>
+                <div id="tokenStatus" style="margin-top: 1rem; padding: 0.75rem; border-radius: 4px; background-color: #f8f9fa;">
+                    <strong>Status:</strong> <span id="tokenStatusText">Not configured</span>
+                </div>
+            </div>
+
+            <!-- JSON Export Section -->
+            <div class="panel-section">
+                <h2>Export JSON Data</h2>
+                <p>Copy the JSON below and commit it to <code>gallery-data.json</code> in your GitHub repository, or save directly if token is configured.</p>
+                <div id="jsonExport">
+                    <textarea id="jsonOutput" readonly></textarea>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button type="button" class="btn" onclick="copyJSON()">Copy JSON to Clipboard</button>
+                        <button type="button" class="btn" onclick="saveJSONToGitHub()" id="saveToGitHubBtn" style="display: none;">Save to GitHub</button>
+                    </div>
+                    <div id="copyMessage" style="margin-top: 0.5rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="control-panel.js"></script>
+</body>
+</html>
