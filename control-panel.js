@@ -243,23 +243,40 @@ let currentSectionFilter = 'all';
 // Load gallery data from JSON file
 async function loadGalleryData() {
     try {
-        // Use GitHub raw URL for reliability (works even if GitHub Pages hasn't updated yet)
+        // Try GitHub raw URL first (most reliable)
         const galleryDataUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.dataFile}`;
-        const response = await fetch(galleryDataUrl);
-        if (!response.ok) {
-            throw new Error('Failed to load gallery data');
-        }
-        galleryData = await response.json();
+        let response = await fetch(galleryDataUrl);
         
-        // Ensure all sections exist
-        if (!galleryData.sections) {
-            galleryData.sections = {
-                'dc-characters': [],
-                'marvel-characters': [],
-                'music-legends': [],
-                'recovery-art': [],
-                'miscellaneous': []
+        // If that fails, try relative path (for local development or GitHub Pages)
+        if (!response.ok) {
+            response = await fetch('gallery-data.json');
+        }
+        
+        if (!response.ok) {
+            // File doesn't exist - create empty structure
+            console.warn('gallery-data.json not found, creating empty structure');
+            galleryData = {
+                sections: {
+                    'dc-characters': [],
+                    'marvel-characters': [],
+                    'music-legends': [],
+                    'recovery-art': [],
+                    'miscellaneous': []
+                }
             };
+        } else {
+            galleryData = await response.json();
+            
+            // Ensure all sections exist
+            if (!galleryData.sections) {
+                galleryData.sections = {
+                    'dc-characters': [],
+                    'marvel-characters': [],
+                    'music-legends': [],
+                    'recovery-art': [],
+                    'miscellaneous': []
+                };
+            }
         }
         
         // Render the pictures list
@@ -275,7 +292,21 @@ async function loadGalleryData() {
         loadGitHubTokenStatus();
     } catch (error) {
         console.error('Error loading gallery data:', error);
-        alert('Error loading gallery data. Please ensure gallery-data.json exists.');
+        // Create empty structure as fallback
+        galleryData = {
+            sections: {
+                'dc-characters': [],
+                'marvel-characters': [],
+                'music-legends': [],
+                'recovery-art': [],
+                'miscellaneous': []
+            }
+        };
+        renderPicturesList();
+        updateJSONExport();
+        setupFileUpload();
+        loadGitHubTokenStatus();
+        console.log('Using empty gallery data structure. You can start adding pictures.');
     }
 }
 
