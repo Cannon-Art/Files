@@ -412,6 +412,18 @@ function fileToBase64(file) {
     });
 }
 
+// Unicode-safe base64 encoding (handles special characters, emojis, etc.)
+function unicodeToBase64(str) {
+    // First, convert the string to UTF-8 bytes
+    const utf8Bytes = new TextEncoder().encode(str);
+    // Then convert bytes to base64
+    let binary = '';
+    for (let i = 0; i < utf8Bytes.length; i++) {
+        binary += String.fromCharCode(utf8Bytes[i]);
+    }
+    return btoa(binary);
+}
+
 // Upload file to GitHub using REST API
 async function uploadFileToGitHub(file, filename) {
     const token = getGitHubToken();
@@ -496,8 +508,8 @@ async function updateGalleryDataOnGitHub(jsonData) {
         throw new Error('Could not read existing gallery-data.json from GitHub');
     }
 
-    // Convert JSON to base64
-    const content = btoa(JSON.stringify(jsonData, null, 2));
+    // Convert JSON to base64 (Unicode-safe)
+    const content = unicodeToBase64(JSON.stringify(jsonData, null, 2));
     
     // Update file
     const response = await fetch(url, {
@@ -518,6 +530,59 @@ async function updateGalleryDataOnGitHub(jsonData) {
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Failed to update gallery-data.json');
+    }
+
+    return true;
+}
+
+// Update any file on GitHub (generic function for HTML files, etc.)
+async function updateGitHubFile(filename, content, commitMessage) {
+    const token = getGitHubToken();
+    if (!token) {
+        throw new Error('GitHub token not configured.');
+    }
+
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filename}`;
+    
+    // Get current file to get SHA (if it exists)
+    let sha = null;
+    try {
+        const checkResponse = await fetch(url, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        if (checkResponse.ok) {
+            const existingFile = await checkResponse.json();
+            sha = existingFile.sha;
+        }
+    } catch (e) {
+        // File doesn't exist, will create new
+    }
+
+    // Convert content to base64 (Unicode-safe)
+    const base64Content = unicodeToBase64(content);
+    
+    // Create or update file
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: commitMessage || `Update ${filename}`,
+            content: base64Content,
+            branch: GITHUB_CONFIG.branch,
+            ...(sha && { sha: sha }) // Include SHA if updating existing file
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Failed to update ${filename}`);
     }
 
     return true;
