@@ -11,8 +11,14 @@
 // 2. Enter your new password
 // 3. Copy the hash
 // 4. Replace the value below with the new hash
-// Verified hash for "password": 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
-const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // Default: "password"
+// 
+// IMPORTANT: Choose a strong password! Examples of good passwords:
+// - Mix of uppercase, lowercase, numbers, and symbols
+// - At least 12 characters long
+// - Not dictionary words or personal information
+//
+// Current password hash
+const PASSWORD_HASH = '751d3802f3db8cd910f2a6cacbbf1faf820b218cb8c3c0dd6a06188ce737c5c2'; // Password: &Can1989non
 
 // Simple SHA-256 hashing function (client-side)
 async function sha256(message) {
