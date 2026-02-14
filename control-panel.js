@@ -244,17 +244,30 @@ let currentSectionFilter = 'all';
 async function loadGalleryData() {
     try {
         // Try GitHub raw URL first (most reliable)
-        const galleryDataUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.dataFile}`;
-        let response = await fetch(galleryDataUrl);
+        const galleryDataUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.dataFile}?t=${Date.now()}`;
+        console.log('Loading gallery data from:', galleryDataUrl);
+        
+        let response = await fetch(galleryDataUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            cache: 'no-cache'
+        });
+        
+        console.log('Response status:', response.status, response.statusText);
         
         // If that fails, try relative path (for local development or GitHub Pages)
         if (!response.ok) {
-            response = await fetch('gallery-data.json');
+            console.log('Trying relative path...');
+            response = await fetch('gallery-data.json?t=' + Date.now(), {
+                cache: 'no-cache'
+            });
         }
         
         if (!response.ok) {
             // File doesn't exist - create empty structure
-            console.warn('gallery-data.json not found, creating empty structure');
+            console.warn('gallery-data.json not found (status:', response.status, '), creating empty structure');
             galleryData = {
                 sections: {
                     'dc-characters': [],
@@ -265,7 +278,10 @@ async function loadGalleryData() {
                 }
             };
         } else {
-            galleryData = await response.json();
+            const jsonText = await response.text();
+            console.log('Received data length:', jsonText.length);
+            galleryData = JSON.parse(jsonText);
+            console.log('Successfully loaded gallery data');
             
             // Ensure all sections exist
             if (!galleryData.sections) {
@@ -292,6 +308,7 @@ async function loadGalleryData() {
         loadGitHubTokenStatus();
     } catch (error) {
         console.error('Error loading gallery data:', error);
+        console.error('Error details:', error.message, error.stack);
         // Create empty structure as fallback
         galleryData = {
             sections: {
@@ -307,6 +324,7 @@ async function loadGalleryData() {
         setupFileUpload();
         loadGitHubTokenStatus();
         console.log('Using empty gallery data structure. You can start adding pictures.');
+        // Don't show alert - just log to console
     }
 }
 
