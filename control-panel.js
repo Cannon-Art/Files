@@ -771,7 +771,7 @@ async function addPicture() {
             await updateGalleryDataOnGitHub(galleryData);
             
             // Step 2: Generate and save HTML files
-            const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+            const generatedHTMLs = callHTMLGenerator(galleryData);
             const htmlFiles = Object.keys(generatedHTMLs);
             let savedCount = 0;
             let errorCount = 0;
@@ -918,7 +918,7 @@ async function updatePictureField(pictureId, section, field, value) {
                 await updateGalleryDataOnGitHub(galleryData);
                 
                 // Generate and save HTML files
-                const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+                const generatedHTMLs = callHTMLGenerator(galleryData);
                 for (const sectionId of Object.keys(generatedHTMLs)) {
                     try {
                         const file = generatedHTMLs[sectionId];
@@ -1030,7 +1030,7 @@ async function saveJSONToGitHub() {
         await updateGalleryDataOnGitHub(galleryData);
         
         // Step 2: Automatically generate and save HTML files
-        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const generatedHTMLs = callHTMLGenerator(galleryData);
         const htmlFiles = Object.keys(generatedHTMLs);
         let savedCount = 0;
         let errorCount = 0;
@@ -1090,7 +1090,7 @@ async function generateAllHTML() {
         messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Generating HTML files... Please wait.</div>';
         
         // Generate HTML for all sections
-        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const generatedHTMLs = callHTMLGenerator(galleryData);
         const fileCount = Object.keys(generatedHTMLs).length;
         
         // Display preview
@@ -1148,7 +1148,7 @@ async function regenerateAllHTML() {
         messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Regenerating all HTML files from current JSON... Please wait.</div>';
         
         // Generate HTML for all sections
-        const generatedHTMLs = generateAllGalleryHTMLs(galleryData);
+        const generatedHTMLs = callHTMLGenerator(galleryData);
         const htmlFiles = Object.keys(generatedHTMLs);
         let savedCount = 0;
         let errorCount = 0;
@@ -1236,101 +1236,18 @@ async function saveHTMLToGitHub(sectionId) {
     }
 }
 
-// Store the original function from html-generator.js BEFORE we define our wrapper
-// Use an IIFE to capture it immediately when this script loads
-const htmlGeneratorFn = (function() {
-    // Capture the function from html-generator.js before control-panel.js defines its own
-    return typeof window !== 'undefined' && window.generateAllGalleryHTMLs ? window.generateAllGalleryHTMLs : null;
-})();
-
-// Helper function to use the HTML generator (from html-generator.js)
-// This wrapper will be called by control-panel.js code, but it delegates to the original
-function generateAllGalleryHTMLs(galleryData) {
-    // Always use the original function from html-generator.js if available
-    if (htmlGeneratorFn && typeof htmlGeneratorFn === 'function') {
-        return htmlGeneratorFn(galleryData);
+// Helper function to call the HTML generator from html-generator.js
+// IMPORTANT: We do NOT define a function named generateAllGalleryHTMLs here
+// because html-generator.js already defines window.generateAllGalleryHTMLs
+// Instead, we create a wrapper with a different name that calls the original
+function callHTMLGenerator(galleryData) {
+    // Check if html-generator.js has loaded and exposed the function
+    if (typeof window !== 'undefined' && window.generateAllGalleryHTMLs && typeof window.generateAllGalleryHTMLs === 'function') {
+        // Call the original function from html-generator.js directly
+        return window.generateAllGalleryHTMLs(galleryData);
     }
     
-    // Fallback: implement inline if html-generator.js didn't load
-    const results = {};
-    const SECTION_METADATA = {
-        'dc-characters': {
-            title: 'DC Characters Collection - Batman & Joker Art | Cannon Art',
-            heroTitle: 'DC Characters',
-            heroSubtitle: 'Batman, The Joker, and the heroes and villains of the DC Universe',
-            description: [
-                'This collection explores the iconic characters of the DC Universe, focusing on the eternal struggle between Batman and The Joker. Each piece captures the duality of heroism and villainy that defines these legendary characters.',
-                'The artworks blend traditional comic book aesthetics with contemporary artistic techniques, creating a unique visual narrative that honors the legacy of DC\'s most beloved characters.'
-            ],
-            keywords: 'DC characters, Batman art, Joker art, DC Universe, comic book art, superhero art, villain art, Batman vs Joker, Heath Ledger Joker, contemporary art, mixed media',
-            ogDescription: 'Explore Cannon DC Characters collection featuring Batman, The Joker, and iconic DC Universe heroes and villains.'
-        },
-        'marvel-characters': {
-            title: 'Marvel Characters Collection - Superhero Art | Cannon Art',
-            heroTitle: 'Marvel Characters',
-            heroSubtitle: 'Heroes and villains from the Marvel Universe',
-            description: [
-                'This collection will feature iconic characters from the Marvel Universe. Stay tuned for new artwork celebrating the heroes and villains that have captivated audiences for generations.'
-            ],
-            keywords: 'Marvel characters, superhero art, X-Men, Avengers, comic book art, Marvel Universe, contemporary art, mixed media',
-            ogDescription: 'Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.'
-        },
-        'music-legends': {
-            title: 'Music Legends Collection - Rock & Roll Art | Cannon Art',
-            heroTitle: 'Music Legends',
-            heroSubtitle: 'Celebrating the icons of rock and roll history',
-            description: [
-                'This collection pays tribute to the legendary rock bands that defined generations. From The Rolling Stones\' timeless rock and roll energy to The Who\'s pioneering rock opera innovations, each piece captures the spirit and influence of these musical icons.',
-                'The mixed media artworks blend contemporary techniques with the raw energy of rock music, creating visual tributes that honor their legendary status and enduring appeal across generations.'
-            ],
-            keywords: 'music legends, rock and roll art, The Rolling Stones, The Who, music art, contemporary art, mixed media, rock music',
-            ogDescription: 'Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.'
-        },
-        'recovery-art': {
-            title: 'Recovery Art Collection - Hope & Transformation | Cannon Art',
-            heroTitle: 'Recovery Art',
-            heroSubtitle: 'Artwork inspired by themes of recovery, hope, and personal transformation',
-            description: [
-                'This collection will feature artwork inspired by themes of recovery, hope, and personal transformation. Each piece will explore the journey of healing and the power of resilience.'
-            ],
-            keywords: 'recovery art, addiction recovery, hope, transformation, healing art, contemporary art, mixed media, personal growth',
-            ogDescription: 'Explore Cannon Recovery Art collection featuring artwork inspired by themes of recovery, hope, and personal transformation.'
-        },
-        'miscellaneous': {
-            title: 'Miscellaneous Collection - Diverse Creative Expressions | Cannon Art',
-            heroTitle: 'Miscellaneous',
-            heroSubtitle: 'A diverse collection of creative expressions',
-            description: [
-                'This collection features a diverse range of creative expressions that don\'t fit into a single category. Each piece represents a unique artistic vision and creative exploration.'
-            ],
-            keywords: 'miscellaneous art, diverse art, creative expressions, contemporary art, mixed media, unique artwork',
-            ogDescription: 'Explore Cannon Miscellaneous collection featuring diverse creative expressions and unique artwork.'
-        }
-    };
-    
-    Object.keys(galleryData.sections).forEach(sectionId => {
-        const pictures = galleryData.sections[sectionId] || [];
-        const metadata = SECTION_METADATA[sectionId];
-        
-        if (!metadata) {
-            console.warn(`No metadata found for section: ${sectionId}`);
-            return;
-        }
-        
-        // Use the generateGalleryHTML function from html-generator.js if available
-        if (typeof window !== 'undefined' && window.generateGalleryHTML) {
-            results[sectionId] = {
-                filename: `${sectionId}.html`,
-                html: window.generateGalleryHTML(sectionId, pictures, metadata)
-            };
-        } else {
-            // Fallback: return empty (shouldn't happen if html-generator.js loads)
-            results[sectionId] = {
-                filename: `${sectionId}.html`,
-                html: '<!-- HTML generator not loaded. Please refresh the page. -->'
-            };
-        }
-    });
-    
-    return results;
+    // Fallback: html-generator.js didn't load - show error
+    console.error('html-generator.js not loaded! Cannot generate HTML files.');
+    throw new Error('HTML generator not available. Please refresh the page to reload html-generator.js');
 }
