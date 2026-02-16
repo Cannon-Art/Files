@@ -972,14 +972,18 @@ async function deletePicture(pictureId, section) {
 }
 
 // Show specific section or all
-function showSection(section) {
+function showSection(section, clickedButton) {
     currentSectionFilter = section;
     
     // Update tab styles
     document.querySelectorAll('.section-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    event.target.classList.add('active');
+    
+    // Activate the clicked button
+    if (clickedButton) {
+        clickedButton.classList.add('active');
+    }
     
     // Re-render list
     renderPicturesList();
