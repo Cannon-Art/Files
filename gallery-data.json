@@ -24,6 +24,14 @@
         "medium": "Oil",
         "notes": "This is the 2nd test",
         "year": "2026"
+      },
+      {
+        "id": "dc-004",
+        "name": "Chelsea_Insignia",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/chelsea_insignia.jpg",
+        "medium": "Mixed Media",
+        "notes": "This is another test today",
+        "year": "2026"
       }
     ],
     "marvel-characters": [
