@@ -8,8 +8,8 @@
     <!-- Primary Meta Tags -->
     <title>Marvel Characters Collection - Superhero Art | Cannon Art</title>
     <meta name="title" content="Marvel Characters Collection - Superhero Art | Cannon Art">
-    <meta name="description" content="Explore Cannon Marvel Characters collection featuring heroes and villains from the Marvel Universe. Contemporary mixed media artwork celebrating iconic superheroes.">
-    <meta name="keywords" content="Marvel characters, superhero art, Marvel Universe, comic book art, Thor art, Avengers art, Spider-Man art, Iron Man art, contemporary art, mixed media">
+    <meta name="description" content="Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.">
+    <meta name="keywords" content="Marvel characters, superhero art, X-Men, Avengers, comic book art, Marvel Universe, contemporary art, mixed media">
     <meta name="author" content="Cannon Art">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
@@ -23,36 +23,43 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cannon-art.github.io/Files/marvel-characters.html">
     <meta property="og:title" content="Marvel Characters Collection - Superhero Art | Cannon Art">
-    <meta property="og:description" content="Explore Cannon Marvel Characters collection featuring heroes and villains from the Marvel Universe.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/Thor.jpg">
+    <meta property="og:description" content="Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Storm_and_Wolverine.JPG">
     <meta property="og:site_name" content="Cannon Art">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://cannon-art.github.io/Files/marvel-characters.html">
     <meta property="twitter:title" content="Marvel Characters Collection - Superhero Art | Cannon Art">
-    <meta property="twitter:description" content="Explore Cannon Marvel Characters collection featuring heroes and villains from the Marvel Universe.">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/Thor.jpg">
+    <meta property="twitter:description" content="Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Storm_and_Wolverine.JPG">
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Marvel Characters Collection - Cannon Art",
-      "description": "Contemporary mixed media artwork featuring heroes and villains from the Marvel Universe",
-      "url": "https://cannon-art.github.io/Files/marvel-characters.html",
-      "mainEntity": {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Marvel Characters Collection - Cannon Art",
+    "description": "Explore Cannon Marvel Characters collection featuring iconic heroes and villains from the Marvel Universe.",
+    "url": "https://cannon-art.github.io/Files/marvel-characters.html",
+    "mainEntity": {
         "@type": "ItemList",
-        "itemListElement": {
-          "@type": "VisualArtwork",
-          "creator": {
-            "@type": "Person",
-            "name": "Cannon Art"
-          }
-        }
-      }
+        "itemListElement": [
+            {
+                "@type": "VisualArtwork",
+                "position": 1,
+                "name": "Storm and Wolverine",
+                "image": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Storm_and_Wolverine.JPG",
+                "creator": {
+                    "@type": "Person",
+                    "name": "Cannon Art"
+                },
+                "artMedium": "Mixed Media",
+                "copyrightYear": "2026"
+            }
+        ]
     }
+}
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
@@ -100,6 +107,7 @@
             <div class="container">
                 <h2 class="section-title">The Collection</h2>
                 <div class="gallery-grid">
+
                     <div class="gallery-item">
                         <div class="gallery-image-container">
                             <img src="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Storm_and_Wolverine.JPG" alt="Storm and Wolverine" class="gallery-image">
@@ -108,7 +116,7 @@
                             </div>
                         </div>
                         <div class="gallery-info">
-                            <h3 class="gallery-title">Storm and Wolverine</h3>
+                            <h3 class="gallery-title">Storm and Wolverine (2026)</h3>
                             <p class="gallery-medium">Mixed Media</p>
                         </div>
                     </div>
@@ -120,7 +128,7 @@
             <div class="container">
                 <h2 class="section-title">About This Collection</h2>
                 <div class="description-content">
-                    <p>This collection will feature iconic characters from the Marvel Universe. Stay tuned for new artwork celebrating the heroes and villains that have captivated audiences for generations.</p>
+<p>This collection will feature iconic characters from the Marvel Universe. Stay tuned for new artwork celebrating the heroes and villains that have captivated audiences for generations.</p>
                 </div>
             </div>
         </section>
@@ -149,100 +157,70 @@
     </script>
     <script src="protection.js"></script>
     <script src="canvas-protection.js"></script>
-
-    <!-- Cookie Consent Banner -->
-    <div id="cookie-consent">
-        <p>
-            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies. 
-            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
-        </p>
-        <div class="cookie-buttons">
-            <button id="decline-cookies" class="decline-cookie">Decline</button>
-            <button id="accept-cookies" class="accept-cookie">Accept All</button>
-        </div>
-    </div>
-
     <script>
-        // Cookie Consent Banner
-        document.addEventListener("DOMContentLoaded", function() {
-            const cookieConsent = document.getElementById('cookie-consent');
-            const acceptBtn = document.getElementById('accept-cookies');
-            const declineBtn = document.getElementById('decline-cookies');
-            
-            // Check if user has already made a choice
-            if (!localStorage.getItem('cookieConsent')) {
-                setTimeout(() => {
-                    cookieConsent.classList.add('show');
-                }, 2000);
-            }
-            
-            // Accept cookies
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'accepted');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
-                    // Load analytics after user accepts
-                    loadAnalytics();
+        // Full size image viewer - handles both img and canvas elements
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const imageElement = this.closest('.gallery-item').querySelector('.gallery-image');
+                const modal = document.createElement('div');
+                modal.className = 'image-modal';
+                
+                let imageSrc;
+                let imageAlt;
+                
+                // Check if it's a canvas (from canvas protection) or an img
+                if (imageElement.tagName === 'CANVAS') {
+                    // Use original source stored in data attribute (avoids CORS issues)
+                    imageSrc = imageElement.dataset.originalSrc || imageElement.toDataURL('image/png');
+                    imageAlt = imageElement.alt || imageElement.getAttribute('alt') || 'Artwork';
+                } else {
+                    // Regular img element
+                    imageSrc = imageElement.src;
+                    imageAlt = imageElement.alt || 'Artwork';
+                }
+                
+                modal.innerHTML = `
+                    <button class="back-modal">Back</button>
+                    <div class="modal-content">
+                        <div class="modal-image-container">
+                            <img src="${imageSrc}" alt="${imageAlt}" class="modal-image">
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Back button
+                modal.querySelector('.back-modal').addEventListener('click', () => {
+                    document.body.removeChild(modal);
                 });
-            }
-            
-            // Load analytics if already accepted
-            if (localStorage.getItem('cookieConsent') === 'accepted') {
-                loadAnalytics();
-            }
-            
-            // Function to load analytics
-            function loadAnalytics() {
-                if (window.__cannonPlausibleLoaded) return;
-                window.__cannonPlausibleLoaded = true;
-                const s = document.createElement('script');
-                s.src = 'analytics.js';
-                document.head.appendChild(s);
-            }
-            
-            // Decline cookies
-            if (declineBtn) {
-                declineBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'declined');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
+                
+                // Close on background click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
                 });
-            }
+            });
         });
-        
-        // GDPR Contact Information
-        function showGDPRInfo() {
-            const gdprInfo = `
-COOKIE & PRIVACY INFORMATION
 
-We use cookies to:
-- Analyze website traffic and visitor behavior
-- Enhance your browsing experience
-- Track which artworks you view and for how long
+        // Expand/collapse notes functionality
+        document.querySelectorAll('.expand-notes-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const notesPreview = this.closest('.gallery-notes').querySelector('.notes-preview');
+                const notesFull = this.closest('.gallery-notes').querySelector('.notes-full');
+                notesPreview.style.display = 'none';
+                notesFull.style.display = 'block';
+            });
+        });
 
-Your Rights (GDPR):
-- You can accept or decline cookies at any time
-- You can request access to your data
-- You can request deletion of your data
-- You can withdraw consent at any time
-
-For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:
-
-Data Protection Officer:
-Cannon Art
-Email: CannonNo1@iCloud.com
-
-See also: Terms of Use (section 10, Privacy and Data Protection).
-
-Cookie preferences can be managed in your browser settings.
-            `;
-            alert(gdprInfo);
-        }
+        document.querySelectorAll('.collapse-notes-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const notesPreview = this.closest('.gallery-notes').querySelector('.notes-preview');
+                const notesFull = this.closest('.gallery-notes').querySelector('.notes-full');
+                notesPreview.style.display = 'block';
+                notesFull.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
