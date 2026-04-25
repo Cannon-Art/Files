@@ -252,15 +252,16 @@ let currentSectionFilter = 'all';
 
 // Load gallery data from JSON file
 async function loadGalleryData() {
+    const defaultSections = {
+        'dc-characters': [],
+        'marvel-characters': [],
+        'music-legends': [],
+        'recovery-art': [],
+        'miscellaneous': []
+    };
+
     try {
         const timestamp = Date.now();
-        const defaultSections = {
-            'dc-characters': [],
-            'marvel-characters': [],
-            'music-legends': [],
-            'recovery-art': [],
-            'miscellaneous': []
-        };
         // Strict single source of truth: same-origin deployed inventory only.
         const source = `${GITHUB_CONFIG.dataFile}?t=${timestamp}`;
         console.log('Loading gallery data from single source:', source);
@@ -286,37 +287,24 @@ async function loadGalleryData() {
         galleryData = parsed;
         galleryData.sections = { ...defaultSections, ...galleryData.sections };
         console.log('Successfully loaded gallery data from single source');
-        
-        // Render the pictures list
+
         renderPicturesList();
-        
-        // Update JSON export
-        updateJSONExport();
-        
-        // Setup file upload handler
-        setupFileUpload();
-        
-        // Load and display GitHub token status
-        loadGitHubTokenStatus();
     } catch (error) {
         console.error('Error loading gallery data:', error);
         console.error('Error details:', error.message, error.stack);
-        // Create empty structure as fallback
-        galleryData = {
-            sections: {
-                'dc-characters': [],
-                'marvel-characters': [],
-                'music-legends': [],
-                'recovery-art': [],
-                'miscellaneous': []
-            }
-        };
+        galleryData = { sections: { ...defaultSections } };
         renderPicturesList();
+        console.log('Using empty gallery data structure. You can start adding pictures.');
+    }
+
+    // Never let optional UI wiring wipe successfully loaded inventory.
+    try {
         updateJSONExport();
         setupFileUpload();
         loadGitHubTokenStatus();
-        console.log('Using empty gallery data structure. You can start adding pictures.');
-        // Don't show alert - just log to console
+    } catch (uiError) {
+        console.error('Control panel UI setup failed (data left intact):', uiError);
+        showPanelToast('Panel UI setup issue: ' + (uiError.message || String(uiError)), true);
     }
 }
 
@@ -740,11 +728,16 @@ function setupFileUpload() {
     const fileName = document.getElementById('fileName');
     const imageUrlInput = document.getElementById('imageUrl');
     const imageUrlRequired = document.getElementById('imageUrlRequired');
-    
+
+    if (!fileInput || !imageUrlInput) {
+        console.warn('File upload fields missing; skipping upload handler setup.');
+        return;
+    }
+
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            fileName.textContent = `Selected: ${file.name}`;
+            if (fileName) fileName.textContent = `Selected: ${file.name}`;
             // Auto-fill image URL field with expected path (will be updated after upload)
             const sanitizedName = document.getElementById('pictureName').value.trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || 'image';
             const fileExtension = file.name.split('.').pop();
@@ -1241,6 +1234,10 @@ function showSection(section, clickedButton) {
 // Update the JSON export textarea
 function updateJSONExport() {
     const jsonOutput = document.getElementById('jsonOutput');
+    if (!jsonOutput) {
+        console.warn('jsonOutput textarea missing; skipping JSON export update.');
+        return;
+    }
     jsonOutput.value = JSON.stringify(galleryData, null, 2);
 }
 
