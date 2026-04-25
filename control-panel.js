@@ -327,22 +327,27 @@ function loadGitHubTokenStatus() {
     const tokenStatusText = document.getElementById('tokenStatusText');
     const saveToGitHubBtn = document.getElementById('saveToGitHubBtn');
     const saveAllMessage = document.getElementById('saveAllMessage');
-    const imageUrlRequired = document.getElementById('imageUrlRequired');
+    const tokenStatusWrap = tokenStatusText ? tokenStatusText.parentElement : null;
+
+    if (!tokenInput || !tokenStatusText || !tokenStatusWrap) {
+        console.warn('Token status UI elements missing; skipping token status update.');
+        return;
+    }
     
     if (token) {
         // Show masked token in input (first 8 chars + ...)
         tokenInput.value = token.substring(0, 8) + '...';
         tokenStatusText.textContent = 'Configured ✓';
-        tokenStatusText.parentElement.style.backgroundColor = '#d4edda';
-        tokenStatusText.parentElement.style.color = '#155724';
-        saveToGitHubBtn.style.display = 'inline-block';
+        tokenStatusWrap.style.backgroundColor = '#d4edda';
+        tokenStatusWrap.style.color = '#155724';
+        if (saveToGitHubBtn) saveToGitHubBtn.style.display = 'inline-block';
         if (saveAllMessage) saveAllMessage.style.display = 'none';
     } else {
         tokenInput.value = '';
         tokenStatusText.textContent = 'Not configured';
-        tokenStatusText.parentElement.style.backgroundColor = '#f8d7da';
-        tokenStatusText.parentElement.style.color = '#721c24';
-        saveToGitHubBtn.style.display = 'none';
+        tokenStatusWrap.style.backgroundColor = '#f8d7da';
+        tokenStatusWrap.style.color = '#721c24';
+        if (saveToGitHubBtn) saveToGitHubBtn.style.display = 'none';
         if (saveAllMessage) saveAllMessage.style.display = 'block';
     }
 }
