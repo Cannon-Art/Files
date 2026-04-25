@@ -196,20 +196,11 @@
             
             // Function to load analytics
             function loadAnalytics() {
-                // Option 1: Plausible Analytics (recommended - requires signup at plausible.io)
-                // Uncomment below and add your domain after signing up
-                /*
-                const script = document.createElement('script');
-                script.defer = true;
-                script.dataset.domain = 'cannon-art.github.io';
-                script.src = 'https://plausible.io/js/script.js';
-                document.head.appendChild(script);
-                */
-                
-                // Option 2: Simple custom analytics (works immediately, logs to console)
-                const simpleScript = document.createElement('script');
-                simpleScript.src = 'simple-analytics.js';
-                document.head.appendChild(simpleScript);
+                if (window.__cannonPlausibleLoaded) return;
+                window.__cannonPlausibleLoaded = true;
+                const s = document.createElement('script');
+                s.src = 'analytics.js';
+                document.head.appendChild(s);
             }
             
             // Decline cookies
@@ -240,9 +231,13 @@ Your Rights (GDPR):
 - You can request deletion of your data
 - You can withdraw consent at any time
 
-For data protection inquiries, please contact:
+For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:
+
+Data Protection Officer:
 Cannon Art
 Email: CannonNo1@iCloud.com
+
+See also: Terms of Use (section 10, Privacy and Data Protection).
 
 Cookie preferences can be managed in your browser settings.
             `;

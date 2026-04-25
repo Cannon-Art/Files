@@ -170,6 +170,85 @@
             });
         });
     </script>
+
+    <!-- Cookie Consent Banner (GDPR) -->
+    <div id="cookie-consent">
+        <p>
+            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies.
+            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
+        </p>
+        <div class="cookie-buttons">
+            <button type="button" id="decline-cookies" class="decline-cookie">Decline</button>
+            <button type="button" id="accept-cookies" class="accept-cookie">Accept All</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('accept-cookies');
+            const declineBtn = document.getElementById('decline-cookies');
+
+            if (!localStorage.getItem('cookieConsent')) {
+                setTimeout(() => cookieConsent.classList.add('show'), 2000);
+            }
+
+            function loadAnalytics() {
+                if (window.__cannonPlausibleLoaded) return;
+                window.__cannonPlausibleLoaded = true;
+                const s = document.createElement('script');
+                s.src = '../analytics.js';
+                document.head.appendChild(s);
+            }
+
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'accepted');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                    loadAnalytics();
+                });
+            }
+
+            if (localStorage.getItem('cookieConsent') === 'accepted') {
+                loadAnalytics();
+            }
+
+            if (declineBtn) {
+                declineBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'declined');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                });
+            }
+        });
+
+        function showGDPRInfo() {
+            alert(`
+COOKIE & PRIVACY INFORMATION
+
+We use cookies to:
+- Analyze website traffic and visitor behavior
+- Enhance your browsing experience
+- Track which artworks you view and for how long
+
+Your Rights (GDPR):
+- You can accept or decline cookies at any time
+- You can request access to your data
+- You can request deletion of your data
+- You can withdraw consent at any time
+
+For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:
+
+Data Protection Officer:
+Cannon Art
+Email: CannonNo1@iCloud.com
+
+See also: Terms of Use (section 10, Privacy and Data Protection).
+
+Cookie preferences can be managed in your browser settings.`.trim());
+        }
+    </script>
 </body>
 </html>
 
