@@ -17,7 +17,7 @@
     <link rel="canonical" href="https://cannon-art.github.io/Files/terms-of-use.html">
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="styles.css?v=10">
     <style>
         .terms-content {
             max-width: 900px;
@@ -123,7 +123,7 @@
         </div>
     </header>
 
-    <main class="main" style="padding-top: 120px;">
+    <main class="main">
         <section class="hero">
             <div class="container">
                 <h2 class="hero-title">Terms of Use</h2>
@@ -231,7 +231,47 @@
             <h2>9. Changes to Terms</h2>
             <p>Cannon Art reserves the right to modify these Terms of Use at any time. Changes will be posted on this page with an updated "Last Updated" date. Continued use of the website after changes constitutes acceptance of the modified terms.</p>
 
-            <h2>10. Contact Information</h2>
+            <h2>10. Privacy and Data Protection (GDPR)</h2>
+            <p>This website uses cookies and analytics to enhance your browsing experience and analyze visitor behavior. We are committed to protecting your privacy and complying with GDPR regulations.</p>
+            
+            <h3>10.1 Data Collection</h3>
+            <p>We collect the following data when you visit our website (only if you accept cookies):</p>
+            <ul>
+                <li>Page views and navigation patterns</li>
+                <li>Time spent on pages and viewing specific artworks</li>
+                <li>Image interactions (hovers, clicks, view duration)</li>
+                <li>Device and browser information</li>
+                <li>Approximate location (country-level, based on timezone)</li>
+                <li>Referrer information (where you came from)</li>
+            </ul>
+            
+            <h3>10.2 Your Rights (GDPR)</h3>
+            <p>Under GDPR, you have the following rights:</p>
+            <ul>
+                <li><strong>Right to Access:</strong> Request a copy of your personal data</li>
+                <li><strong>Right to Rectification:</strong> Request correction of inaccurate data</li>
+                <li><strong>Right to Erasure:</strong> Request deletion of your data</li>
+                <li><strong>Right to Restrict Processing:</strong> Request limitation of data processing</li>
+                <li><strong>Right to Data Portability:</strong> Receive your data in a structured format</li>
+                <li><strong>Right to Object:</strong> Object to processing of your data</li>
+                <li><strong>Right to Withdraw Consent:</strong> Withdraw cookie consent at any time</li>
+            </ul>
+            
+            <h3>10.3 Data Protection Contact</h3>
+            <p>For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:</p>
+            <p><strong>Data Protection Officer:</strong><br>
+            Cannon Art<br>
+            Email: <a href="mailto:CannonNo1@iCloud.com" style="color: #169B62; text-decoration: underline;">CannonNo1@iCloud.com</a></p>
+            
+            <h3>10.4 Cookie Management</h3>
+            <p>You can manage your cookie preferences at any time:</p>
+            <ul>
+                <li>Accept or decline cookies using the cookie consent banner</li>
+                <li>Clear your browser's local storage to reset cookie preferences</li>
+                <li>Configure cookie settings in your browser preferences</li>
+            </ul>
+
+            <h2>11. Contact Information</h2>
             <p>For questions about these Terms of Use, licensing inquiries, or to report copyright infringement, please contact:</p>
             <p><strong>Email:</strong> CannonNo1@iCloud.com</p>
             <p><strong>Website:</strong> https://cannon-art.github.io/Files/</p>
@@ -245,7 +285,7 @@
     <footer class="footer">
         <div class="container footer-content">
             <p class="footer-left">&copy; <span class="copyright-year">2026</span> Cannon Art | All Rights Reserved | <a href="terms-of-use.html" style="color: #00BFFF; font-weight: 600; text-decoration: underline; font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Terms of Use</a></p>
-            <p class="footer-right" style="font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; color: #fff;">| A v I d Digital |</p>
+            <p class="footer-right"><img src="AvId_Digital_Small.png" alt="Avid Digital"></p>
         </div>
     </footer>
 
@@ -257,6 +297,106 @@
         });
     </script>
     <script src="protection.js"></script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent">
+        <p>
+            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies. 
+            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
+        </p>
+        <div class="cookie-buttons">
+            <button id="decline-cookies" class="decline-cookie">Decline</button>
+            <button id="accept-cookies" class="accept-cookie">Accept All</button>
+        </div>
+    </div>
+
+    <script>
+        // Cookie Consent Banner
+        document.addEventListener("DOMContentLoaded", function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('accept-cookies');
+            const declineBtn = document.getElementById('decline-cookies');
+            
+            // Check if user has already made a choice
+            if (!localStorage.getItem('cookieConsent')) {
+                setTimeout(() => {
+                    cookieConsent.classList.add('show');
+                }, 2000);
+            }
+            
+            // Accept cookies
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'accepted');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => {
+                        cookieConsent.classList.remove('show');
+                    }, 500);
+                    // Load analytics after user accepts
+                    loadAnalytics();
+                });
+            }
+            
+            // Load analytics if already accepted
+            if (localStorage.getItem('cookieConsent') === 'accepted') {
+                loadAnalytics();
+            }
+            
+            // Function to load analytics
+            function loadAnalytics() {
+                // Option 1: Plausible Analytics (recommended - requires signup at plausible.io)
+                // Uncomment below and add your domain after signing up
+                /*
+                const script = document.createElement('script');
+                script.defer = true;
+                script.dataset.domain = 'cannon-art.github.io';
+                script.src = 'https://plausible.io/js/script.js';
+                document.head.appendChild(script);
+                */
+                
+                // Option 2: Simple custom analytics (works immediately, logs to console)
+                const simpleScript = document.createElement('script');
+                simpleScript.src = 'simple-analytics.js';
+                document.head.appendChild(simpleScript);
+            }
+            
+            // Decline cookies
+            if (declineBtn) {
+                declineBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'declined');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => {
+                        cookieConsent.classList.remove('show');
+                    }, 500);
+                });
+            }
+        });
+        
+        // GDPR Contact Information
+        function showGDPRInfo() {
+            const gdprInfo = `
+COOKIE & PRIVACY INFORMATION
+
+We use cookies to:
+- Analyze website traffic and visitor behavior
+- Enhance your browsing experience
+- Track which artworks you view and for how long
+
+Your Rights (GDPR):
+- You can accept or decline cookies at any time
+- You can request access to your data
+- You can request deletion of your data
+- You can withdraw consent at any time
+
+For data protection inquiries, please contact:
+Cannon Art
+Email: CannonNo1@iCloud.com
+
+Cookie preferences can be managed in your browser settings.
+            `;
+            alert(gdprInfo);
+        }
+    </script>
 </body>
 </html>
 

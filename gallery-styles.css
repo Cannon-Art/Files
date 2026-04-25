@@ -454,20 +454,7 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Batman collection specific styling */
-body:has(.hero-title:contains("Batman")) .hero {
-    background: linear-gradient(135deg, #169B62 0%, #0d6b3f 100%);
-}
-
-/* Rolling Stones collection specific styling */
-body:has(.hero-title:contains("Rolling Stones")) .hero {
-    background: linear-gradient(135deg, #169B62 0%, #0d6b3f 100%);
-}
-
-/* The Who collection specific styling */
-body:has(.hero-title:contains("The Who")) .hero {
-    background: linear-gradient(135deg, #169B62 0%, #0d6b3f 100%);
-}
+/* Collection pages use the same black hero as the main site (see styles.css .hero) */
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {

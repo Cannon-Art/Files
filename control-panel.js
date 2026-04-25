@@ -222,6 +222,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    const addFromRepo = document.getElementById('addImageFromRepo');
+    if (addFromRepo) {
+        addFromRepo.addEventListener('change', function() {
+            if (this.value) {
+                const urlInput = document.getElementById('imageUrl');
+                if (urlInput) urlInput.value = this.value;
+                this.selectedIndex = 0;
+            }
+        });
+    }
 });
 
 // ============================================================================
@@ -527,10 +537,104 @@ async function uploadFileToGitHub(file, filename) {
         throw new Error(error.message || 'Failed to upload file to GitHub');
     }
 
-    const result = await response.json();
-    
+    await response.json();
+
     // Return the raw GitHub URL
     return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${path}`;
+}
+
+// Invalidate cached Art_Examples listing (after upload)
+function invalidateArtExamplesCache() {
+    artExamplesCache = null;
+}
+
+let artExamplesCache = null;
+
+function rawUrlForArtExample(filename) {
+    const enc = encodeURIComponent(filename).replace(/%2F/g, '/');
+    return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.imagePath}/${enc}`;
+}
+
+async function fetchArtExamplesList() {
+    if (artExamplesCache) return artExamplesCache;
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodeURIComponent(GITHUB_CONFIG.imagePath)}?ref=${encodeURIComponent(GITHUB_CONFIG.branch)}`;
+    const headers = { Accept: 'application/vnd.github.v3+json' };
+    const token = getGitHubToken();
+    if (token) headers.Authorization = `token ${token}`;
+    const res = await fetch(url, { headers });
+    if (res.status === 403) {
+        throw new Error('GitHub returned 403. Add a token under Settings or try again later.');
+    }
+    if (!res.ok) {
+        throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
+    }
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+        throw new Error('Unexpected response from GitHub (not a folder listing).');
+    }
+    const imageExt = /\.(jpe?g|png|gif|webp|svg)$/i;
+    artExamplesCache = data
+        .filter((f) => f.type === 'file' && imageExt.test(f.name))
+        .map((f) => ({
+            name: f.name,
+            url: f.download_url || rawUrlForArtExample(f.name)
+        }));
+    return artExamplesCache;
+}
+
+function fillSelectWithRepoImages(selectEl, placeholderLabel) {
+    if (!selectEl) return;
+    const firstText = placeholderLabel || '— Pick file to set Image URL —';
+    selectEl.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = firstText;
+    selectEl.appendChild(opt0);
+    const list = artExamplesCache || [];
+    list.forEach((f) => {
+        const o = document.createElement('option');
+        o.value = f.url;
+        o.textContent = f.name;
+        selectEl.appendChild(o);
+    });
+}
+
+async function refreshArtExamplesPickers() {
+    try {
+        invalidateArtExamplesCache();
+        const files = await fetchArtExamplesList();
+        fillSelectWithRepoImages(document.getElementById('addImageFromRepo'), '— Pick file to fill Image URL —');
+        document.querySelectorAll('select.restore-repo-image').forEach((sel) => {
+            fillSelectWithRepoImages(sel, '— Restore from Art_Examples —');
+        });
+        showPanelToast(`Loaded ${files.length} image(s) from Art_Examples.`, false);
+    } catch (e) {
+        console.error(e);
+        showPanelToast(e.message || String(e), true);
+    }
+}
+
+function showPanelToast(message, isError) {
+    const el = document.getElementById('panelToast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.remove('hidden', 'success', 'error');
+    el.classList.add(isError ? 'error' : 'success');
+    clearTimeout(showPanelToast._t);
+    showPanelToast._t = setTimeout(() => {
+        el.classList.add('hidden');
+    }, isError ? 8000 : 4000);
+}
+
+const pictureFieldDebounceTimers = {};
+
+function schedulePictureFieldUpdate(pictureId, section, field, getValue) {
+    const key = `${pictureId}|${field}`;
+    clearTimeout(pictureFieldDebounceTimers[key]);
+    pictureFieldDebounceTimers[key] = setTimeout(() => {
+        delete pictureFieldDebounceTimers[key];
+        updatePictureField(pictureId, section, field, getValue());
+    }, 550);
 }
 
 // Update gallery-data.json on GitHub
@@ -728,7 +832,8 @@ async function addPicture() {
             
             // Upload file to GitHub
             imageUrl = await uploadFileToGitHub(file, filename);
-            
+            invalidateArtExamplesCache();
+
             // Update the image URL field
             document.getElementById('imageUrl').value = imageUrl;
             
@@ -824,80 +929,185 @@ async function addPicture() {
 // EDIT EXISTING PICTURES
 // ============================================================================
 
-// Render the list of pictures
+function appendPictureEditor(container, picture, sectionKey, sectionName) {
+    const pictureItem = document.createElement('div');
+    pictureItem.className = 'picture-item';
+    pictureItem.dataset.pictureId = picture.id;
+    pictureItem.dataset.section = sectionKey;
+
+    const header = document.createElement('div');
+    header.className = 'picture-header';
+    const h3 = document.createElement('h3');
+    h3.style.color = '#169B62';
+    h3.style.margin = '0';
+    h3.textContent = picture.name || '';
+    const actions = document.createElement('div');
+    actions.className = 'picture-actions';
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn-danger';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', () => deletePicture(picture.id, sectionKey));
+    actions.appendChild(delBtn);
+    header.appendChild(h3);
+    header.appendChild(actions);
+    pictureItem.appendChild(header);
+
+    const sectionRow = document.createElement('div');
+    sectionRow.className = 'picture-section-meta';
+    sectionRow.style.marginBottom = '1rem';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Section: ';
+    sectionRow.appendChild(strong);
+    sectionRow.appendChild(document.createTextNode(sectionName));
+    pictureItem.appendChild(sectionRow);
+
+    if (picture.imageUrl && String(picture.imageUrl).trim()) {
+        const imgWrap = document.createElement('div');
+        imgWrap.style.marginBottom = '1rem';
+        const img = document.createElement('img');
+        img.className = 'picture-preview';
+        img.alt = picture.name || '';
+        img.referrerPolicy = 'no-referrer';
+        img.loading = 'lazy';
+        img.src = String(picture.imageUrl).trim();
+        const errP = document.createElement('p');
+        errP.className = 'picture-preview-err hidden';
+        errP.textContent = 'Image could not load. Check the URL or pick a file from Art_Examples below.';
+        img.addEventListener('error', () => {
+            img.style.display = 'none';
+            errP.classList.remove('hidden');
+        });
+        img.addEventListener('load', () => {
+            img.style.display = '';
+            errP.classList.add('hidden');
+        });
+        imgWrap.appendChild(img);
+        imgWrap.appendChild(errP);
+        pictureItem.appendChild(imgWrap);
+    }
+
+    function mkTextField(labelText, fieldKey, val) {
+        const wrap = document.createElement('div');
+        wrap.className = 'editable-field';
+        const lab = document.createElement('label');
+        lab.textContent = labelText;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = val || '';
+        input.addEventListener('input', () =>
+            schedulePictureFieldUpdate(picture.id, sectionKey, fieldKey, () => input.value)
+        );
+        wrap.appendChild(lab);
+        wrap.appendChild(input);
+        return wrap;
+    }
+
+    pictureItem.appendChild(mkTextField('Picture Name *', 'name', picture.name));
+    pictureItem.appendChild(mkTextField('Image URL *', 'imageUrl', picture.imageUrl || ''));
+
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '1fr 1fr';
+    row.style.gap = '1rem';
+
+    const medWrap = document.createElement('div');
+    medWrap.className = 'editable-field';
+    const medLab = document.createElement('label');
+    medLab.textContent = 'Medium *';
+    const medSel = document.createElement('select');
+    ['Oil', 'Watercolour', 'Acrylic', 'Pencil', 'Mixed Media'].forEach((m) => {
+        const o = document.createElement('option');
+        o.value = m;
+        o.textContent = m;
+        if (picture.medium === m) o.selected = true;
+        medSel.appendChild(o);
+    });
+    medSel.addEventListener('change', () => updatePictureField(picture.id, sectionKey, 'medium', medSel.value));
+    medWrap.appendChild(medLab);
+    medWrap.appendChild(medSel);
+    row.appendChild(medWrap);
+
+    const yearWrap = document.createElement('div');
+    yearWrap.className = 'editable-field';
+    const yearLab = document.createElement('label');
+    yearLab.textContent = 'Year (optional)';
+    const yearIn = document.createElement('input');
+    yearIn.type = 'text';
+    yearIn.value = picture.year || '';
+    yearIn.addEventListener('input', () =>
+        schedulePictureFieldUpdate(picture.id, sectionKey, 'year', () => yearIn.value)
+    );
+    yearWrap.appendChild(yearLab);
+    yearWrap.appendChild(yearIn);
+    row.appendChild(yearWrap);
+    pictureItem.appendChild(row);
+
+    const notesWrap = document.createElement('div');
+    notesWrap.className = 'editable-field';
+    const notesLab = document.createElement('label');
+    notesLab.textContent = 'Notes (optional)';
+    const ta = document.createElement('textarea');
+    ta.lang = 'en';
+    ta.spellcheck = true;
+    ta.value = picture.notes || '';
+    ta.addEventListener('input', () =>
+        schedulePictureFieldUpdate(picture.id, sectionKey, 'notes', () => ta.value)
+    );
+    notesWrap.appendChild(notesLab);
+    notesWrap.appendChild(ta);
+    pictureItem.appendChild(notesWrap);
+
+    const restoreWrap = document.createElement('div');
+    restoreWrap.className = 'editable-field';
+    const restoreLab = document.createElement('label');
+    restoreLab.textContent = 'Restore Image URL from Art_Examples';
+    const restoreSel = document.createElement('select');
+    restoreSel.className = 'restore-repo-image';
+    fillSelectWithRepoImages(restoreSel, '— Restore from Art_Examples —');
+    restoreSel.addEventListener('change', () => {
+        if (!restoreSel.value) return;
+        void updatePictureField(picture.id, sectionKey, 'imageUrl', restoreSel.value);
+        restoreSel.selectedIndex = 0;
+    });
+    restoreWrap.appendChild(restoreLab);
+    restoreWrap.appendChild(restoreSel);
+    pictureItem.appendChild(restoreWrap);
+
+    container.appendChild(pictureItem);
+}
+
 function renderPicturesList() {
     const picturesList = document.getElementById('picturesList');
+    if (!picturesList) return;
     picturesList.innerHTML = '';
-    
-    // Get sections to display based on filter
-    const sectionsToShow = currentSectionFilter === 'all' 
-        ? Object.keys(galleryData.sections)
-        : [currentSectionFilter];
-    
-    sectionsToShow.forEach(sectionKey => {
-        const sectionName = {
-            'dc-characters': 'DC Characters',
-            'marvel-characters': 'Marvel Characters',
-            'music-legends': 'Music Legends',
-            'recovery-art': 'Recovery Art',
-            'miscellaneous': 'Miscellaneous'
-        }[sectionKey] || sectionKey;
-        
+
+    const sectionsToShow =
+        currentSectionFilter === 'all' ? Object.keys(galleryData.sections) : [currentSectionFilter];
+
+    sectionsToShow.forEach((sectionKey) => {
+        const sectionName =
+            {
+                'dc-characters': 'DC Characters',
+                'marvel-characters': 'Marvel Characters',
+                'music-legends': 'Music Legends',
+                'recovery-art': 'Recovery Art',
+                miscellaneous: 'Miscellaneous'
+            }[sectionKey] || sectionKey;
+
         const pictures = galleryData.sections[sectionKey] || [];
-        
+
         if (pictures.length === 0 && currentSectionFilter !== 'all') {
-            picturesList.innerHTML += `<p style="color: #666; padding: 2rem; text-align: center;">No pictures in ${sectionName} section yet.</p>`;
+            const p = document.createElement('p');
+            p.style.cssText = 'color:#666;padding:2rem;text-align:center;';
+            p.textContent = `No pictures in ${sectionName} section yet.`;
+            picturesList.appendChild(p);
             return;
         }
-        
-        pictures.forEach(picture => {
-            const pictureItem = document.createElement('div');
-            pictureItem.className = 'picture-item';
-            pictureItem.setAttribute('data-picture-id', picture.id);
-            pictureItem.setAttribute('data-section', sectionKey);
-            
-            pictureItem.innerHTML = `
-                <div class="picture-header">
-                    <h3 style="color: #169B62; margin: 0;">${escapeHtml(picture.name)}</h3>
-                    <div class="picture-actions">
-                        <button class="btn btn-danger" onclick="deletePicture('${picture.id}', '${sectionKey}')">Delete</button>
-                    </div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <strong>Section:</strong> ${sectionName}
-                </div>
-                ${picture.imageUrl ? `<img src="${escapeHtml(picture.imageUrl)}" alt="${escapeHtml(picture.name)}" class="picture-preview" onerror="this.style.display='none'">` : ''}
-                <div class="editable-field">
-                    <label>Picture Name *</label>
-                    <input type="text" value="${escapeHtml(picture.name)}" onchange="updatePictureField('${picture.id}', '${sectionKey}', 'name', this.value)">
-                </div>
-                <div class="editable-field">
-                    <label>Image URL *</label>
-                    <input type="text" value="${escapeHtml(picture.imageUrl)}" onchange="updatePictureField('${picture.id}', '${sectionKey}', 'imageUrl', this.value)">
-                </div>
-                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="editable-field">
-                        <label>Medium *</label>
-                        <select onchange="updatePictureField('${picture.id}', '${sectionKey}', 'medium', this.value)">
-                            <option value="Oil" ${picture.medium === 'Oil' ? 'selected' : ''}>Oil</option>
-                            <option value="Watercolour" ${picture.medium === 'Watercolour' ? 'selected' : ''}>Watercolour</option>
-                            <option value="Acrylic" ${picture.medium === 'Acrylic' ? 'selected' : ''}>Acrylic</option>
-                            <option value="Pencil" ${picture.medium === 'Pencil' ? 'selected' : ''}>Pencil</option>
-                            <option value="Mixed Media" ${picture.medium === 'Mixed Media' ? 'selected' : ''}>Mixed Media</option>
-                        </select>
-                    </div>
-                    <div class="editable-field">
-                        <label>Year (optional)</label>
-                        <input type="text" value="${escapeHtml(picture.year || '')}" onchange="updatePictureField('${picture.id}', '${sectionKey}', 'year', this.value)">
-                    </div>
-                </div>
-                <div class="editable-field">
-                    <label>Notes (optional)</label>
-                    <textarea lang="en" spellcheck="true" onchange="updatePictureField('${picture.id}', '${sectionKey}', 'notes', this.value)">${escapeHtml(picture.notes || '')}</textarea>
-                </div>
-            `;
-            
-            picturesList.appendChild(pictureItem);
+
+        pictures.forEach((picture) => {
+            appendPictureEditor(picturesList, picture, sectionKey, sectionName);
         });
     });
 }
@@ -905,42 +1115,90 @@ function renderPicturesList() {
 // Update a field in a picture
 async function updatePictureField(pictureId, section, field, value) {
     const picture = galleryData.sections[section].find(p => p.id === pictureId);
-    if (picture) {
-        picture[field] = value.trim();
-        
-        // Update JSON export
-        updateJSONExport();
-        
-        // Auto-save to GitHub (JSON + HTML) if token is configured
-        if (hasGitHubToken()) {
-            try {
-                // Save JSON
-                await updateGalleryDataOnGitHub(galleryData);
-                
-                // Generate and save HTML files
-                const generatedHTMLs = callHTMLGenerator(galleryData);
-                for (const sectionId of Object.keys(generatedHTMLs)) {
-                    try {
-                        const file = generatedHTMLs[sectionId];
-                        await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
-                    } catch (error) {
-                        console.error(`Failed to save ${file.filename}:`, error);
-                    }
+    if (!picture) return;
+
+    picture[field] = value.trim();
+
+    // Update JSON export
+    updateJSONExport();
+
+    const pictureElement = document.querySelector(`[data-picture-id="${pictureId}"]`);
+    if (pictureElement) {
+        if (field === 'name') {
+            const h3 = pictureElement.querySelector('.picture-header h3');
+            if (h3) h3.textContent = picture.name;
+            const img = pictureElement.querySelector('img.picture-preview');
+            if (img) img.alt = picture.name;
+        }
+        if (field === 'imageUrl') {
+            let img = pictureElement.querySelector('img.picture-preview');
+            let errP = pictureElement.querySelector('.picture-preview-err');
+            if (!picture.imageUrl) {
+                const wrap = img && img.parentElement;
+                if (wrap && wrap.querySelector('.picture-preview-err')) {
+                    wrap.remove();
+                } else if (img) {
+                    img.remove();
                 }
-            } catch (error) {
-                console.error('Failed to update GitHub:', error);
-                // Silently fail - user can still copy JSON manually
+            } else {
+                if (!img) {
+                    const wrap = document.createElement('div');
+                    wrap.style.marginBottom = '1rem';
+                    img = document.createElement('img');
+                    img.className = 'picture-preview';
+                    img.alt = picture.name || '';
+                    img.referrerPolicy = 'no-referrer';
+                    img.loading = 'lazy';
+                    errP = document.createElement('p');
+                    errP.className = 'picture-preview-err hidden';
+                    errP.textContent =
+                        'Image could not load. Check the URL or pick a file from Art_Examples below.';
+                    img.addEventListener('error', () => {
+                        img.style.display = 'none';
+                        errP.classList.remove('hidden');
+                    });
+                    img.addEventListener('load', () => {
+                        img.style.display = '';
+                        errP.classList.add('hidden');
+                    });
+                    wrap.appendChild(img);
+                    wrap.appendChild(errP);
+                    const meta = pictureElement.querySelector('.picture-section-meta');
+                    if (meta) meta.after(wrap);
+                    else pictureElement.prepend(wrap);
+                }
+                img.src = picture.imageUrl;
+                img.style.display = '';
+                if (errP) errP.classList.add('hidden');
             }
         }
-        
-        // Visual feedback
-        const pictureElement = document.querySelector(`[data-picture-id="${pictureId}"]`);
-        if (pictureElement) {
-            pictureElement.classList.add('editing');
-            setTimeout(() => {
-                pictureElement.classList.remove('editing');
-            }, 1000);
+    }
+
+    // Auto-save to GitHub (JSON + HTML) if token is configured
+    if (hasGitHubToken()) {
+        try {
+            await updateGalleryDataOnGitHub(galleryData);
+            const generatedHTMLs = callHTMLGenerator(galleryData);
+            for (const sectionId of Object.keys(generatedHTMLs)) {
+                try {
+                    const file = generatedHTMLs[sectionId];
+                    await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
+                } catch (error) {
+                    console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
+                }
+            }
+            showPanelToast('Saved to GitHub.', false);
+        } catch (error) {
+            console.error('Failed to update GitHub:', error);
+            showPanelToast('Could not save to GitHub: ' + (error.message || String(error)), true);
         }
+    }
+
+    if (pictureElement) {
+        pictureElement.classList.add('editing');
+        setTimeout(() => {
+            pictureElement.classList.remove('editing');
+        }, 1000);
     }
 }
 

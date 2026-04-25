@@ -225,8 +225,8 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=8">
-    <link rel="stylesheet" href="gallery-styles.css?v=12">
+    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="gallery-styles.css?v=13">
 </head>
 <body>
     <header class="header">
@@ -294,7 +294,7 @@ ${descriptionHTML.trim()}
     <footer class="footer">
         <div class="container footer-content">
             <p class="footer-left">&copy; <span class="copyright-year">2026</span> Cannon Art | All Rights Reserved | <a href="terms-of-use.html" style="color: #00BFFF; font-weight: 600; text-decoration: underline; font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Terms of Use</a></p>
-            <p class="footer-right" style="font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; color: #fff;">| A v I d Digital |</p>
+            <p class="footer-right"><img src="AvId_Digital_Small.png" alt="Avid Digital"></p>
         </div>
     </footer>
 
