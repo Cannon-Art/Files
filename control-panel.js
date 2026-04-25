@@ -253,57 +253,39 @@ let currentSectionFilter = 'all';
 // Load gallery data from JSON file
 async function loadGalleryData() {
     try {
-        // Try GitHub raw URL first (most reliable)
-        const galleryDataUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${GITHUB_CONFIG.dataFile}?t=${Date.now()}`;
-        console.log('Loading gallery data from:', galleryDataUrl);
-        
-        let response = await fetch(galleryDataUrl, {
+        const timestamp = Date.now();
+        const defaultSections = {
+            'dc-characters': [],
+            'marvel-characters': [],
+            'music-legends': [],
+            'recovery-art': [],
+            'miscellaneous': []
+        };
+        // Strict single source of truth: same-origin deployed inventory only.
+        const source = `${GITHUB_CONFIG.dataFile}?t=${timestamp}`;
+        console.log('Loading gallery data from single source:', source);
+        const response = await fetch(source, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json',
+                Accept: 'application/json',
+                'Cache-Control': 'no-cache'
             },
-            cache: 'no-cache'
+            cache: 'reload'
         });
-        
-        console.log('Response status:', response.status, response.statusText);
-        
-        // If that fails, try relative path (for local development or GitHub Pages)
+
         if (!response.ok) {
-            console.log('Trying relative path...');
-            response = await fetch('gallery-data.json?t=' + Date.now(), {
-                cache: 'no-cache'
-            });
+            throw new Error(`gallery-data fetch failed: ${response.status} ${response.statusText}`);
         }
-        
-        if (!response.ok) {
-            // File doesn't exist - create empty structure
-            console.warn('gallery-data.json not found (status:', response.status, '), creating empty structure');
-            galleryData = {
-                sections: {
-                    'dc-characters': [],
-                    'marvel-characters': [],
-                    'music-legends': [],
-                    'recovery-art': [],
-                    'miscellaneous': []
-                }
-            };
-        } else {
-            const jsonText = await response.text();
-            console.log('Received data length:', jsonText.length);
-            galleryData = JSON.parse(jsonText);
-            console.log('Successfully loaded gallery data');
-            
-            // Ensure all sections exist
-            if (!galleryData.sections) {
-                galleryData.sections = {
-                    'dc-characters': [],
-                    'marvel-characters': [],
-                    'music-legends': [],
-                    'recovery-art': [],
-                    'miscellaneous': []
-                };
-            }
+
+        const jsonText = await response.text();
+        const parsed = JSON.parse(jsonText);
+        if (!parsed || typeof parsed !== 'object' || !parsed.sections || typeof parsed.sections !== 'object') {
+            throw new Error('gallery-data.json has invalid structure (missing sections)');
         }
+
+        galleryData = parsed;
+        galleryData.sections = { ...defaultSections, ...galleryData.sections };
+        console.log('Successfully loaded gallery data from single source');
         
         // Render the pictures list
         renderPicturesList();
