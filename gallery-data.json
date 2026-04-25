@@ -71,6 +71,14 @@
         "medium": "Mixed Media",
         "notes": "",
         "year": "2026"
+      },
+      {
+        "id": "misc-003",
+        "name": "Spurs_Insignia",
+        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/spurs_insignia.png",
+        "medium": "Mixed Media",
+        "notes": "This is another test",
+        "year": ""
       }
     ]
   }
