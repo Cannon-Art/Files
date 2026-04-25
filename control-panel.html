@@ -456,7 +456,7 @@
                 <h2>Add New Picture</h2>
                 <form id="addPictureForm">
                     <div class="form-group">
-                        <label for="imageFile">Image file (optional)</label>
+                        <label for="imageFile">Image File *</label>
                         <div class="file-upload-wrapper">
                             <label for="imageFile" class="file-upload-label">
                                 Click to select image file
@@ -465,18 +465,8 @@
                             <div id="fileName" class="file-name"></div>
                         </div>
                         <small style="color: #666; margin-top: 0.5rem; display: block;">
-                            Optional: upload a new file to GitHub, or paste an Image URL below, or pick an existing file from <code>Art_Examples</code>.
+                            Select an image file to upload directly to GitHub. The Image URL will be auto-generated after upload.
                         </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="addImageFromRepo">Existing images on GitHub (<code>Art_Examples</code>)</label>
-                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                            <button type="button" class="btn btn-secondary" onclick="refreshArtExamplesPickers()">Load / refresh list</button>
-                        </div>
-                        <select id="addImageFromRepo" aria-label="Pick existing image from repository">
-                            <option value="">— Load list first, then pick a file to fill Image URL —</option>
-                        </select>
                     </div>
 
                     <div class="form-group">
@@ -513,7 +503,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="imageUrl">Image URL <span id="imageUrlRequired">*</span></label>
-                            <input type="text" id="imageUrl" placeholder="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/... (auto-filled if uploading file)">
+                            <input type="text" id="imageUrl" placeholder="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/...">
                             <small style="color: #666; margin-top: 0.25rem; display: block;">
                                 Required if not uploading a file. Auto-filled if uploading.
                             </small>
@@ -682,7 +672,7 @@ See also: Terms of Use (section 10, Privacy and Data Protection).
 Cookie preferences can be managed in your browser settings.`.trim());
         }
     </script>
-    <script src="html-generator.js?v=20260425-3"></script>
-    <script src="control-panel.js?v=20260425-3"></script>
+    <script src="html-generator.js?v=20260425-4"></script>
+    <script src="control-panel.js?v=20260425-4"></script>
 </body>
 </html>

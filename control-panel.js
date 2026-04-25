@@ -302,6 +302,7 @@ async function loadGalleryData() {
         updateJSONExport();
         setupFileUpload();
         loadGitHubTokenStatus();
+        void refreshArtExamplesPickers();
     } catch (uiError) {
         console.error('Control panel UI setup failed (data left intact):', uiError);
         showPanelToast('Panel UI setup issue: ' + (uiError.message || String(uiError)), true);
@@ -578,7 +579,6 @@ async function refreshArtExamplesPickers() {
     try {
         invalidateArtExamplesCache();
         const files = await fetchArtExamplesList();
-        fillSelectWithRepoImages(document.getElementById('addImageFromRepo'), '— Pick file to fill Image URL —');
         document.querySelectorAll('select.restore-repo-image').forEach((sel) => {
             fillSelectWithRepoImages(sel, '— Restore from Art_Examples —');
         });
