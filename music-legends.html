@@ -6,10 +6,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
     <!-- Primary Meta Tags -->
-    <title>Music Legends Collection - Rolling Stones & The Who Art | Cannon Art</title>
-    <meta name="title" content="Music Legends Collection - Rolling Stones & The Who Art | Cannon Art">
-    <meta name="description" content="Explore Cannon Music Legends collection featuring The Rolling Stones and The Who. Contemporary mixed media artwork celebrating the icons of rock and roll history.">
-    <meta name="keywords" content="Music legends, Rolling Stones art, The Who art, rock and roll art, music art, band art, rock music, contemporary art, mixed media, music icons">
+    <title>Music Legends Collection - Rock &amp; Roll Art | Cannon Art</title>
+    <meta name="title" content="Music Legends Collection - Rock &amp; Roll Art | Cannon Art">
+    <meta name="description" content="Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.">
+    <meta name="keywords" content="music legends, rock and roll art, The Rolling Stones, The Who, music art, contemporary art, mixed media, rock music">
     <meta name="author" content="Cannon Art">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
@@ -22,37 +22,31 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cannon-art.github.io/Files/music-legends.html">
-    <meta property="og:title" content="Music Legends Collection - Rolling Stones & The Who Art | Cannon Art">
-    <meta property="og:description" content="Explore Cannon Music Legends collection featuring The Rolling Stones and The Who.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/The Rolling Stones 1.jpg">
+    <meta property="og:title" content="Music Legends Collection - Rock &amp; Roll Art | Cannon Art">
+    <meta property="og:description" content="Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/OIP.jpg">
     <meta property="og:site_name" content="Cannon Art">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://cannon-art.github.io/Files/music-legends.html">
-    <meta property="twitter:title" content="Music Legends Collection - Rolling Stones & The Who Art | Cannon Art">
-    <meta property="twitter:description" content="Explore Cannon Music Legends collection featuring The Rolling Stones and The Who.">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/The Rolling Stones 1.jpg">
+    <meta property="twitter:title" content="Music Legends Collection - Rock &amp; Roll Art | Cannon Art">
+    <meta property="twitter:description" content="Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/OIP.jpg">
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Music Legends Collection - Cannon Art",
-      "description": "Contemporary mixed media artwork celebrating the icons of rock and roll history",
-      "url": "https://cannon-art.github.io/Files/music-legends.html",
-      "mainEntity": {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Music Legends Collection - Cannon Art",
+    "description": "Explore Cannon Music Legends collection celebrating iconic rock and roll bands and musicians.",
+    "url": "https://cannon-art.github.io/Files/music-legends.html",
+    "mainEntity": {
         "@type": "ItemList",
-        "itemListElement": {
-          "@type": "VisualArtwork",
-          "creator": {
-            "@type": "Person",
-            "name": "Cannon Art"
-          }
-        }
-      }
+        "itemListElement": []
     }
+}
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
@@ -100,6 +94,7 @@
             <div class="container">
                 <h2 class="section-title">The Collection</h2>
                 <div class="gallery-grid">
+
                     <div class="empty-gallery">
                         <p class="empty-message">New artwork coming soon...</p>
                     </div>
@@ -111,7 +106,7 @@
             <div class="container">
                 <h2 class="section-title">About This Collection</h2>
                 <div class="description-content">
-                    <p>This collection pays tribute to the legendary rock bands that defined generations. From The Rolling Stones' timeless rock and roll energy to The Who's pioneering rock opera innovations, each piece captures the spirit and influence of these musical icons.</p>
+<p>This collection pays tribute to the legendary rock bands that defined generations. From The Rolling Stones' timeless rock and roll energy to The Who's pioneering rock opera innovations, each piece captures the spirit and influence of these musical icons.</p>
                     <p>The mixed media artworks blend contemporary techniques with the raw energy of rock music, creating visual tributes that honor their legendary status and enduring appeal across generations.</p>
                 </div>
             </div>
@@ -184,112 +179,27 @@
                         document.body.removeChild(modal);
                     }
                 });
-                
-                // Close on Escape key
-                const handleEscape = (e) => {
-                    if (e.key === 'Escape') {
-                        document.body.removeChild(modal);
-                        document.removeEventListener('keydown', handleEscape);
-                    }
-                };
-                document.addEventListener('keydown', handleEscape);
             });
         });
-    </script>
 
-    <!-- Cookie Consent Banner -->
-    <div id="cookie-consent">
-        <p>
-            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies. 
-            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
-        </p>
-        <div class="cookie-buttons">
-            <button id="decline-cookies" class="decline-cookie">Decline</button>
-            <button id="accept-cookies" class="accept-cookie">Accept All</button>
-        </div>
-    </div>
-
-    <script>
-        // Cookie Consent Banner
-        document.addEventListener("DOMContentLoaded", function() {
-            const cookieConsent = document.getElementById('cookie-consent');
-            const acceptBtn = document.getElementById('accept-cookies');
-            const declineBtn = document.getElementById('decline-cookies');
-            
-            // Check if user has already made a choice
-            if (!localStorage.getItem('cookieConsent')) {
-                setTimeout(() => {
-                    cookieConsent.classList.add('show');
-                }, 2000);
-            }
-            
-            // Accept cookies
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'accepted');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
-                    // Load analytics after user accepts
-                    loadAnalytics();
-                });
-            }
-            
-            // Load analytics if already accepted
-            if (localStorage.getItem('cookieConsent') === 'accepted') {
-                loadAnalytics();
-            }
-            
-            // Function to load analytics
-            function loadAnalytics() {
-                if (window.__cannonPlausibleLoaded) return;
-                window.__cannonPlausibleLoaded = true;
-                const s = document.createElement('script');
-                s.src = 'analytics.js';
-                document.head.appendChild(s);
-            }
-            
-            // Decline cookies
-            if (declineBtn) {
-                declineBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'declined');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
-                });
-            }
+        // Expand/collapse notes functionality
+        document.querySelectorAll('.expand-notes-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const notesPreview = this.closest('.gallery-notes').querySelector('.notes-preview');
+                const notesFull = this.closest('.gallery-notes').querySelector('.notes-full');
+                notesPreview.style.display = 'none';
+                notesFull.style.display = 'block';
+            });
         });
-        
-        // GDPR Contact Information
-        function showGDPRInfo() {
-            const gdprInfo = `
-COOKIE & PRIVACY INFORMATION
 
-We use cookies to:
-- Analyze website traffic and visitor behavior
-- Enhance your browsing experience
-- Track which artworks you view and for how long
-
-Your Rights (GDPR):
-- You can accept or decline cookies at any time
-- You can request access to your data
-- You can request deletion of your data
-- You can withdraw consent at any time
-
-For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:
-
-Data Protection Officer:
-Cannon Art
-Email: CannonNo1@iCloud.com
-
-See also: Terms of Use (section 10, Privacy and Data Protection).
-
-Cookie preferences can be managed in your browser settings.
-            `;
-            alert(gdprInfo);
-        }
+        document.querySelectorAll('.collapse-notes-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const notesPreview = this.closest('.gallery-notes').querySelector('.notes-preview');
+                const notesFull = this.closest('.gallery-notes').querySelector('.notes-full');
+                notesPreview.style.display = 'block';
+                notesFull.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
