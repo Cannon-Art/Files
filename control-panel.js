@@ -395,6 +395,7 @@ let galleryData = {
 };
 
 let currentSectionFilter = 'all';
+let currentPanelView = 'add';
 
 // Load gallery data from JSON file
 async function loadGalleryData() {
@@ -434,12 +435,12 @@ async function loadGalleryData() {
         galleryData.sections = { ...defaultSections, ...galleryData.sections };
         console.log('Successfully loaded gallery data from single source');
 
-        renderPicturesList();
+        refreshPictureLists();
     } catch (error) {
         console.error('Error loading gallery data:', error);
         console.error('Error details:', error.message, error.stack);
         galleryData = { sections: { ...defaultSections } };
-        renderPicturesList();
+        refreshPictureLists();
         console.log('Using empty gallery data structure. You can start adding pictures.');
     }
 
@@ -448,6 +449,9 @@ async function loadGalleryData() {
         setupFileUpload();
         loadGitHubTokenStatus();
         void refreshArtExamplesPickers();
+        if (!hasGitHubToken()) {
+            showPanelView('token', document.querySelector('.panel-nav-tab[onclick*="token"]'));
+        }
     } catch (uiError) {
         console.error('Control panel UI setup failed (data left intact):', uiError);
         showPanelToast('Panel UI setup issue: ' + (uiError.message || String(uiError)), true);
@@ -457,6 +461,11 @@ async function loadGalleryData() {
 // Load GitHub token from localStorage (optional legacy UI hooks)
 function loadGitHubTokenStatus() {
     const token = getGitHubToken();
+    const statusEl = document.getElementById('tokenAdminStatus');
+    if (statusEl) {
+        statusEl.textContent = token ? 'Configured ✓' : 'Not configured';
+        statusEl.className = token ? 'token-status configured' : 'token-status not-configured';
+    }
     const saveToGitHubBtn = document.getElementById('saveToGitHubBtn');
     const saveAllMessage = document.getElementById('saveAllMessage');
     if (saveToGitHubBtn) saveToGitHubBtn.style.display = token ? 'inline-block' : 'none';
@@ -490,6 +499,45 @@ function saveGitHubToken() {
         loadGitHubTokenStatus();
     } else {
         showPanelToast('Failed to save token.', true);
+    }
+}
+
+function clearGitHubToken() {
+    if (!getGitHubToken()) {
+        showPanelToast('No token is saved in this browser.', false);
+        return;
+    }
+    if (!confirm('Remove the saved GitHub token from this browser? You will need to enter it again to publish changes.')) {
+        return;
+    }
+    try {
+        localStorage.removeItem('github_token');
+    } catch (e) {
+        console.warn('Could not clear GitHub token:', e);
+    }
+    showPanelToast('Token cleared.', false);
+    loadGitHubTokenStatus();
+}
+
+function showPanelView(view, clickedButton) {
+    currentPanelView = view;
+    const views = {
+        add: document.getElementById('panelViewAdd'),
+        edit: document.getElementById('panelViewEdit'),
+        delete: document.getElementById('panelViewDelete'),
+        token: document.getElementById('panelViewToken')
+    };
+    Object.keys(views).forEach((key) => {
+        const el = views[key];
+        if (el) el.classList.toggle('hidden', key !== view);
+    });
+    document.querySelectorAll('.panel-nav-tab').forEach((tab) => tab.classList.remove('active'));
+    if (clickedButton) clickedButton.classList.add('active');
+    if (view === 'edit' || view === 'delete') {
+        refreshPictureLists();
+    }
+    if (view === 'token') {
+        loadGitHubTokenStatus();
     }
 }
 
@@ -1004,7 +1052,7 @@ async function addPicture() {
     document.getElementById('fileName').textContent = '';
     
     // Update display
-    renderPicturesList();
+    refreshPictureLists();
     
     // Scroll to the new picture
     setTimeout(() => {
@@ -1035,16 +1083,7 @@ function appendPictureEditor(container, picture, sectionKey, sectionName) {
     h3.style.color = '#169B62';
     h3.style.margin = '0';
     h3.textContent = picture.name || '';
-    const actions = document.createElement('div');
-    actions.className = 'picture-actions';
-    const delBtn = document.createElement('button');
-    delBtn.type = 'button';
-    delBtn.className = 'btn btn-danger';
-    delBtn.textContent = 'Delete';
-    delBtn.addEventListener('click', () => deletePicture(picture.id, sectionKey));
-    actions.appendChild(delBtn);
     header.appendChild(h3);
-    header.appendChild(actions);
     pictureItem.appendChild(header);
 
     const sectionRow = document.createElement('div');
@@ -1180,24 +1219,68 @@ function appendPictureEditor(container, picture, sectionKey, sectionName) {
     container.appendChild(pictureItem);
 }
 
+function appendPictureDeleteRow(container, picture, sectionKey, sectionName) {
+    const row = document.createElement('div');
+    row.className = 'delete-picture-item';
+    row.dataset.pictureId = picture.id;
+    row.dataset.section = sectionKey;
+
+    if (picture.imageUrl && String(picture.imageUrl).trim()) {
+        const img = document.createElement('img');
+        img.className = 'delete-picture-thumb';
+        img.alt = picture.name || '';
+        img.referrerPolicy = 'no-referrer';
+        img.loading = 'lazy';
+        img.src = String(picture.imageUrl).trim();
+        row.appendChild(img);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'delete-picture-info';
+    const h3 = document.createElement('h3');
+    h3.textContent = picture.name || 'Untitled';
+    const meta = document.createElement('p');
+    meta.textContent = sectionName;
+    info.appendChild(h3);
+    info.appendChild(meta);
+    row.appendChild(info);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn-danger';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', () => deletePicture(picture.id, sectionKey));
+    row.appendChild(delBtn);
+
+    container.appendChild(row);
+}
+
+function getSectionsToShow() {
+    return currentSectionFilter === 'all' ? Object.keys(galleryData.sections) : [currentSectionFilter];
+}
+
+function getSectionDisplayName(sectionKey) {
+    return {
+        'dc-characters': 'DC Characters',
+        'marvel-characters': 'Marvel Characters',
+        'music-legends': 'Music Legends',
+        'recovery-art': 'Recovery Art',
+        miscellaneous: 'Miscellaneous'
+    }[sectionKey] || sectionKey;
+}
+
+function refreshPictureLists() {
+    renderPicturesList();
+    renderDeletePicturesList();
+}
+
 function renderPicturesList() {
     const picturesList = document.getElementById('picturesList');
     if (!picturesList) return;
     picturesList.innerHTML = '';
 
-    const sectionsToShow =
-        currentSectionFilter === 'all' ? Object.keys(galleryData.sections) : [currentSectionFilter];
-
-    sectionsToShow.forEach((sectionKey) => {
-        const sectionName =
-            {
-                'dc-characters': 'DC Characters',
-                'marvel-characters': 'Marvel Characters',
-                'music-legends': 'Music Legends',
-                'recovery-art': 'Recovery Art',
-                miscellaneous: 'Miscellaneous'
-            }[sectionKey] || sectionKey;
-
+    getSectionsToShow().forEach((sectionKey) => {
+        const sectionName = getSectionDisplayName(sectionKey);
         const pictures = galleryData.sections[sectionKey] || [];
 
         if (pictures.length === 0 && currentSectionFilter !== 'all') {
@@ -1212,6 +1295,31 @@ function renderPicturesList() {
             appendPictureEditor(picturesList, picture, sectionKey, sectionName);
         });
     });
+}
+
+function renderDeletePicturesList() {
+    const picturesDeleteList = document.getElementById('picturesDeleteList');
+    if (!picturesDeleteList) return;
+    picturesDeleteList.innerHTML = '';
+
+    let total = 0;
+    getSectionsToShow().forEach((sectionKey) => {
+        const sectionName = getSectionDisplayName(sectionKey);
+        const pictures = galleryData.sections[sectionKey] || [];
+        total += pictures.length;
+        pictures.forEach((picture) => {
+            appendPictureDeleteRow(picturesDeleteList, picture, sectionKey, sectionName);
+        });
+    });
+
+    if (total === 0) {
+        const p = document.createElement('p');
+        p.style.cssText = 'color:#666;padding:2rem;text-align:center;';
+        p.textContent = currentSectionFilter === 'all'
+            ? 'No pictures to delete.'
+            : `No pictures in ${getSectionDisplayName(currentSectionFilter)} section.`;
+        picturesDeleteList.appendChild(p);
+    }
 }
 
 // Update a field in a picture
@@ -1334,7 +1442,7 @@ async function deletePicture(pictureId, section) {
         }
         
         // Update display
-        renderPicturesList();
+        refreshPictureLists();
     }
 }
 
@@ -1342,18 +1450,27 @@ async function deletePicture(pictureId, section) {
 function showSection(section, clickedButton) {
     currentSectionFilter = section;
     
-    // Update tab styles
-    document.querySelectorAll('.section-tab').forEach(tab => {
+    // Update tab styles in both Edit and Delete section filters
+    document.querySelectorAll('#editSectionTabs .section-tab, #deleteSectionTabs .section-tab').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    // Activate the clicked button
     if (clickedButton) {
         clickedButton.classList.add('active');
+        const tabsContainer = clickedButton.closest('.section-tabs');
+        if (tabsContainer) {
+            const index = Array.from(tabsContainer.querySelectorAll('.section-tab')).indexOf(clickedButton);
+            const mirrorContainer = tabsContainer.id === 'editSectionTabs'
+                ? document.getElementById('deleteSectionTabs')
+                : document.getElementById('editSectionTabs');
+            if (mirrorContainer && index >= 0) {
+                const mirrorTab = mirrorContainer.querySelectorAll('.section-tab')[index];
+                if (mirrorTab) mirrorTab.classList.add('active');
+            }
+        }
     }
     
-    // Re-render list
-    renderPicturesList();
+    refreshPictureLists();
 }
 
 // ============================================================================

@@ -119,8 +119,14 @@ function checkControlPanelUi() {
 
     if (!html.includes('Edit Existing Pictures')) {
         fail('control-panel.html — missing Edit Existing Pictures section');
+    }
+    if (!html.includes('Token Admin') || !html.includes('panelViewDelete')) {
+        fail('control-panel.html — missing panel submenu views');
+    }
+    if (html.includes('Regenerate All HTML Files') || html.includes('Export JSON Data')) {
+        fail('control-panel.html — advanced regenerate/export UI still present');
     } else {
-        pass('control-panel.html — advanced regenerate/export UI removed');
+        pass('control-panel.html — panel submenu and simplified admin UI');
     }
 
     const jsPath = join(ROOT, 'control-panel.js');
