@@ -454,6 +454,50 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Gallery pages: equal vertical padding — no tall empty band under the title */
+.hero {
+    position: static !important;
+    display: block !important;
+    min-height: 0 !important;
+    padding: 2.75rem 1.25rem !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.hero .container {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.hero .hero-title {
+    margin: 0 0 0.65rem !important;
+    padding: 0 !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+}
+
+.hero .hero-subtitle {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 2.25rem 15px !important;
+    }
+}
+
 /* Collection pages use the same black hero as the main site (see styles.css .hero) */
 
 /* Accessibility improvements */

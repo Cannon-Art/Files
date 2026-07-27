@@ -231,54 +231,48 @@ body {
     margin-top: 64px; /* matches shorter fixed header (~20% less than 80px) */
 }
 
-/* Hero Section */
+/* Hero Section — equal top/bottom padding so title block sits in the middle */
 .hero {
     background-color: #000;
     color: #fff;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 180px;
-    padding: 2.5rem 20px;
+    display: block;
+    position: static;
+    min-height: 0;
+    padding: 2.75rem 1.25rem;
     box-sizing: border-box;
 }
 
 .hero .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: static;
+    transform: none;
+    display: block;
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
     padding: 0;
     box-sizing: border-box;
-    gap: 0.75rem;
     text-align: center;
 }
 
 .hero-title {
     font-family: 'Old English Text MT', 'UnifrakturMaguntia', 'Blackletter', cursive;
-    font-size: 2.42rem; /* +10% from 2.2rem */
+    font-size: 2.42rem; /* smaller than desktop .logo (3.6rem) */
     font-weight: 700;
-    margin: 0;
-    line-height: 1.15;
+    margin: 0 0 0.65rem;
+    padding: 0;
+    line-height: 1.05;
     text-align: center;
-    width: 100%;
-    max-width: 100%;
 }
 
 .hero-subtitle {
-    font-size: 1.32rem; /* +10% from 1.2rem */
+    font-size: 1.32rem;
     font-weight: 300;
     opacity: 0.9;
-    margin: 0 auto;
+    margin: 0;
+    padding: 0;
     line-height: 1.25;
     text-align: center;
-    width: 100%;
-    max-width: 100%;
-    align-self: center;
 }
 
 /* Section Titles */
@@ -651,11 +645,11 @@ body {
     }
     
     .hero-title {
-        font-size: 2.2rem; /* +10% from 2rem */
+        font-size: 1.7rem; /* keep below mobile logo (1.92rem) */
     }
     
     .hero-subtitle {
-        font-size: 1.1rem; /* +10% from 1rem */
+        font-size: 1rem;
     }
     
     .section-title {
@@ -698,18 +692,25 @@ body {
     }
     
     .hero {
-        min-height: 140px;
-        padding: 2rem 15px;
+        min-height: 0;
+        padding: 2.25rem 15px;
     }
     
     .hero .container {
         padding: 0;
-        gap: 0.5rem;
+        transform: none;
+        position: static;
     }
     
     .hero-title {
-        font-size: 1.98rem; /* +10% from 1.8rem */
-        line-height: 1.15;
+        font-size: 1.55rem; /* keep below mobile logo (1.92rem) */
+        line-height: 1.05;
+        margin: 0 0 0.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.25;
     }
     
     .gallery, .about, .contact {
