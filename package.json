@@ -1,0 +1,10 @@
+{
+  "name": "cannon-art-gallery-site",
+  "private": true,
+  "description": "Static Cannon Art gallery; local checks before GitHub push",
+  "scripts": {
+    "test": "node scripts/verify.mjs",
+    "verify": "node scripts/verify.mjs",
+    "serve": "npx --yes serve . -l 3333"
+  }
+}

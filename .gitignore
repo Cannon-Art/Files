@@ -28,6 +28,9 @@ desktop.ini
 *.swo
 *~
 
+# Node (local verify / optional tooling)
+node_modules/
+
 # Temporary files
 *.tmp
 *.temp

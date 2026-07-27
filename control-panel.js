@@ -1,6 +1,59 @@
 // Control Panel JavaScript
 // This file handles all the logic for the gallery management control panel
 
+/** Cannon-Art gallery: Pen options replace Oil. */
+const PICTURE_MEDIUM_OPTIONS_CANNON_ART = ['Watercolour', 'Acrylic', 'Pencil', 'Pen', 'Pen & Pencil', 'Mixed Media'];
+
+/** PaulCasso gallery: original medium list (includes Oil). */
+const PICTURE_MEDIUM_OPTIONS_PAULCASSO = ['Oil', 'Watercolour', 'Acrylic', 'Pencil', 'Mixed Media'];
+
+/**
+ * Which site this control panel build targets. PaulCasso: set
+ * <meta name="gallery-site" content="paulcasso"> in control-panel.html,
+ * or serve from a hostname containing "paulcasso". Otherwise Cannon-Art.
+ */
+function getGallerySiteId() {
+    const meta = document.querySelector('meta[name="gallery-site"]');
+    const fromMeta = meta?.getAttribute('content')?.trim().toLowerCase();
+    if (fromMeta === 'paulcasso') return 'paulcasso';
+    if (fromMeta === 'cannon-art') return 'cannon-art';
+    const host = typeof location !== 'undefined' && location.hostname ? location.hostname.toLowerCase() : '';
+    if (host.includes('paulcasso')) return 'paulcasso';
+    return 'cannon-art';
+}
+
+function getPictureMediumOptions() {
+    return getGallerySiteId() === 'paulcasso' ? PICTURE_MEDIUM_OPTIONS_PAULCASSO : PICTURE_MEDIUM_OPTIONS_CANNON_ART;
+}
+
+/** Fills the "add picture" Medium &lt;select&gt; from the list for the active site. */
+function initPictureMediumDropdown() {
+    const sel = document.getElementById('pictureMedium');
+    if (!sel) return;
+    const previous = sel.value;
+    const opts = getPictureMediumOptions();
+    sel.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Select medium...';
+    sel.appendChild(placeholder);
+    opts.forEach((m) => {
+        const o = document.createElement('option');
+        o.value = m;
+        o.textContent = m;
+        sel.appendChild(o);
+    });
+    if (previous && opts.includes(previous)) {
+        sel.value = previous;
+    } else if (previous && !opts.includes(previous)) {
+        const o = document.createElement('option');
+        o.value = previous;
+        o.textContent = previous;
+        sel.appendChild(o);
+        sel.value = previous;
+    }
+}
+
 // ============================================================================
 // PASSWORD PROTECTION
 // ============================================================================
@@ -20,15 +73,108 @@
 // Default password hash (initial password)
 const DEFAULT_PASSWORD_HASH = '751d3802f3db8cd910f2a6cacbbf1faf820b218cb8c3c0dd6a06188ce737c5c2'; // Password: &Can1989non
 
-// Get current password hash (checks localStorage first, then falls back to default)
+/**
+ * Auto-login for the admin console only (same browser). This is not the account password.
+ * Removing this key (or stale mismatch) only shows the password field again — it does not
+ * reset or change the password the user chose; they sign in again with the same password.
+ */
+const CONTROL_PANEL_SESSION_KEY = 'controlPanelAuthSessionHash';
+
+/** Mirrors `controlPanelPasswordHash` so the chosen password can survive some “clear data” flows that drop localStorage but keep cookies. */
+const PASSWORD_HASH_COOKIE_NAME = 'cp_ph';
+
+function readPasswordHashCookie() {
+    if (typeof document === 'undefined') return null;
+    const needle = `${PASSWORD_HASH_COOKIE_NAME}=`;
+    const parts = document.cookie.split(';');
+    for (let i = 0; i < parts.length; i++) {
+        const p = parts[i].trim();
+        if (p.startsWith(needle)) {
+            try {
+                return decodeURIComponent(p.slice(needle.length));
+            } catch (e) {
+                return null;
+            }
+        }
+    }
+    return null;
+}
+
+function writePasswordHashCookie(hash) {
+    if (typeof document === 'undefined') return;
+    const maxAge = 10 * 365 * 24 * 60 * 60; // 10 years
+    const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${PASSWORD_HASH_COOKIE_NAME}=${encodeURIComponent(hash)};path=/;max-age=${maxAge};samesite=strict${secure}`;
+}
+
+function persistControlPanelSession(passwordHashHex) {
+    try {
+        localStorage.setItem(CONTROL_PANEL_SESSION_KEY, passwordHashHex);
+    } catch (e) {
+        console.warn('Could not persist admin session:', e);
+    }
+}
+
+/** Clears only auto-login. Never removes `controlPanelPasswordHash` or the password cookie. */
+function clearControlPanelSession() {
+    try {
+        localStorage.removeItem(CONTROL_PANEL_SESSION_KEY);
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+/** If a previous login in this browser matches the current password hash, skip the login form. */
+function tryRestoreControlPanelSession() {
+    const loginForm = document.getElementById('loginForm');
+    const controlPanel = document.getElementById('controlPanel');
+    if (!loginForm || !controlPanel) return false;
+    let stored;
+    try {
+        stored = localStorage.getItem(CONTROL_PANEL_SESSION_KEY);
+    } catch (e) {
+        return false;
+    }
+    if (!stored) return false;
+    if (stored === getPasswordHash()) {
+        loginForm.classList.add('hidden');
+        controlPanel.classList.remove('hidden');
+        loadGalleryData();
+        return true;
+    }
+    clearControlPanelSession();
+    return false;
+}
+
+// Get current password hash: localStorage, then cookie mirror, then built-in default.
 function getPasswordHash() {
-    const storedHash = localStorage.getItem('controlPanelPasswordHash');
+    let storedHash = null;
+    try {
+        storedHash = localStorage.getItem('controlPanelPasswordHash');
+    } catch (e) {
+        /* quota / private mode */
+    }
+    if (!storedHash) {
+        storedHash = readPasswordHashCookie();
+        if (storedHash) {
+            try {
+                localStorage.setItem('controlPanelPasswordHash', storedHash);
+            } catch (e) {
+                /* keep using cookie-backed value in memory for this page only */
+            }
+        }
+    }
     return storedHash || DEFAULT_PASSWORD_HASH;
 }
 
-// Set new password hash
+// Set new password hash (persists both localStorage and cookie so “clear cache” is less likely to drop the password alone)
 function setPasswordHash(hash) {
-    localStorage.setItem('controlPanelPasswordHash', hash);
+    try {
+        localStorage.setItem('controlPanelPasswordHash', hash);
+    } catch (e) {
+        console.warn('Could not save password hash to localStorage:', e);
+    }
+    writePasswordHashCookie(hash);
 }
 
 // Simple SHA-256 hashing function (client-side)
@@ -74,12 +220,6 @@ async function checkPassword() {
     // Get current password hash
     const currentPasswordHash = getPasswordHash();
     
-    // Debug logging (check browser console)
-    console.log('Entered password:', password);
-    console.log('Entered password hash:', hash);
-    console.log('Expected hash:', currentPasswordHash);
-    console.log('Hashes match:', hash === currentPasswordHash);
-    
     if (hash === currentPasswordHash) {
         // Check if using default password - prompt to change
         if (hash === DEFAULT_PASSWORD_HASH) {
@@ -88,7 +228,9 @@ async function checkPassword() {
             return;
         }
         
-        // Correct password - show control panel
+        // Correct password - show control panel (mirror hash to cookie so it survives some cache clears)
+        persistControlPanelSession(hash);
+        writePasswordHashCookie(hash);
         loginForm.classList.add('hidden');
         controlPanel.classList.remove('hidden');
         
@@ -177,6 +319,7 @@ async function changePassword() {
         
         // Save new password hash
         setPasswordHash(newHash);
+        persistControlPanelSession(newHash);
         
         // Hide modal and show control panel
         passwordChangeModal.classList.add('hidden');
@@ -208,12 +351,15 @@ function cancelPasswordChange() {
     loginForm.classList.add('hidden');
     controlPanel.classList.remove('hidden');
     
+    persistControlPanelSession(DEFAULT_PASSWORD_HASH);
     // Load gallery data
     loadGalleryData();
 }
 
 // Allow Enter key to submit login form
 document.addEventListener('DOMContentLoaded', function() {
+    initPictureMediumDropdown();
+    tryRestoreControlPanelSession();
     const passwordInput = document.getElementById('passwordInput');
     if (passwordInput) {
         passwordInput.addEventListener('keypress', function(e) {
@@ -299,7 +445,6 @@ async function loadGalleryData() {
 
     // Never let optional UI wiring wipe successfully loaded inventory.
     try {
-        updateJSONExport();
         setupFileUpload();
         loadGitHubTokenStatus();
         void refreshArtExamplesPickers();
@@ -309,72 +454,42 @@ async function loadGalleryData() {
     }
 }
 
-// Load GitHub token from localStorage and display status
+// Load GitHub token from localStorage (optional legacy UI hooks)
 function loadGitHubTokenStatus() {
     const token = getGitHubToken();
-    const tokenInput = document.getElementById('githubToken');
-    const tokenStatusText = document.getElementById('tokenStatusText');
     const saveToGitHubBtn = document.getElementById('saveToGitHubBtn');
     const saveAllMessage = document.getElementById('saveAllMessage');
-    const tokenStatusWrap = tokenStatusText ? tokenStatusText.parentElement : null;
-
-    if (!tokenInput || !tokenStatusText || !tokenStatusWrap) {
-        console.warn('Token status UI elements missing; skipping token status update.');
-        return;
-    }
-    
-    if (token) {
-        // Show masked token in input (first 8 chars + ...)
-        tokenInput.value = token.substring(0, 8) + '...';
-        tokenStatusText.textContent = 'Configured ✓';
-        tokenStatusWrap.style.backgroundColor = '#d4edda';
-        tokenStatusWrap.style.color = '#155724';
-        if (saveToGitHubBtn) saveToGitHubBtn.style.display = 'inline-block';
-        if (saveAllMessage) saveAllMessage.style.display = 'none';
-    } else {
-        tokenInput.value = '';
-        tokenStatusText.textContent = 'Not configured';
-        tokenStatusWrap.style.backgroundColor = '#f8d7da';
-        tokenStatusWrap.style.color = '#721c24';
-        if (saveToGitHubBtn) saveToGitHubBtn.style.display = 'none';
-        if (saveAllMessage) saveAllMessage.style.display = 'block';
-    }
+    if (saveToGitHubBtn) saveToGitHubBtn.style.display = token ? 'inline-block' : 'none';
+    if (saveAllMessage) saveAllMessage.style.display = token ? 'none' : 'block';
 }
 
-// Save GitHub token
+// Save GitHub token (prompts for token; stored in localStorage only)
 function saveGitHubToken() {
-    const tokenInput = document.getElementById('githubToken');
-    const tokenMessage = document.getElementById('tokenMessage');
-    const token = tokenInput.value.trim();
+    const existing = getGitHubToken();
+    const entered = prompt(existing ? 'Enter GitHub token (cancel to keep current):' : 'Enter GitHub token:');
+    if (entered === null) return;
+
+    const token = entered.trim();
     
     if (!token) {
-        tokenMessage.innerHTML = '<div class="error-message">Please enter a GitHub token</div>';
+        if (existing) {
+            showPanelToast('Token unchanged.', false);
+            return;
+        }
+        showPanelToast('Please enter a GitHub token.', true);
         return;
     }
-    
-    // Basic validation (GitHub tokens are typically 40+ characters)
-    if (token.length < 20) {
-        tokenMessage.innerHTML = '<div class="error-message">Token appears to be invalid. GitHub tokens are typically longer.</div>';
-        return;
-    }
-    
-    if (setGitHubToken(token)) {
-        tokenMessage.innerHTML = '<div class="success-message">Token saved successfully!</div>';
-        loadGitHubTokenStatus();
-        setTimeout(() => {
-            tokenMessage.innerHTML = '';
-        }, 3000);
-    } else {
-        tokenMessage.innerHTML = '<div class="error-message">Failed to save token</div>';
-    }
-}
 
-// Clear GitHub token
-function clearGitHubToken() {
-    if (confirm('Are you sure you want to clear the GitHub token? You will need to enter it again to upload files.')) {
-        localStorage.removeItem('github_token');
+    if (token.length < 20) {
+        showPanelToast('Token appears invalid (too short).', true);
+        return;
+    }
+
+    if (setGitHubToken(token)) {
+        showPanelToast('Token saved.', false);
         loadGitHubTokenStatus();
-        document.getElementById('tokenMessage').innerHTML = '<div class="success-message">Token cleared</div>';
+    } else {
+        showPanelToast('Failed to save token.', true);
     }
 }
 
@@ -878,10 +993,10 @@ async function addPicture() {
                 messageDiv.innerHTML = `<div class="success-message">✅ Picture added! Saved gallery-data.json and ${savedCount} HTML file(s). ${errorCount} file(s) failed.</div>`;
             }
         } catch (error) {
-            messageDiv.innerHTML = `<div class="error-message">Picture added locally, but failed to update GitHub: ${error.message}. Please copy the JSON below and commit manually.</div>`;
+            messageDiv.innerHTML = `<div class="error-message">Picture added locally, but failed to update GitHub: ${error.message}. Check your token and try again.</div>`;
         }
     } else {
-        messageDiv.innerHTML = '<div class="success-message">Picture added successfully! Please copy the JSON below and commit it to GitHub manually.</div>';
+        messageDiv.innerHTML = '<div class="success-message">Picture added locally. Configure a GitHub token (Save Token) to publish changes automatically.</div>';
     }
     
     // Clear form
@@ -890,7 +1005,6 @@ async function addPicture() {
     
     // Update display
     renderPicturesList();
-    updateJSONExport();
     
     // Scroll to the new picture
     setTimeout(() => {
@@ -997,13 +1111,21 @@ function appendPictureEditor(container, picture, sectionKey, sectionName) {
     const medLab = document.createElement('label');
     medLab.textContent = 'Medium *';
     const medSel = document.createElement('select');
-    ['Oil', 'Watercolour', 'Acrylic', 'Pencil', 'Mixed Media'].forEach((m) => {
+    const mediumOpts = getPictureMediumOptions();
+    mediumOpts.forEach((m) => {
         const o = document.createElement('option');
         o.value = m;
         o.textContent = m;
         if (picture.medium === m) o.selected = true;
         medSel.appendChild(o);
     });
+    if (picture.medium && !mediumOpts.includes(picture.medium)) {
+        const o = document.createElement('option');
+        o.value = picture.medium;
+        o.textContent = picture.medium;
+        o.selected = true;
+        medSel.appendChild(o);
+    }
     medSel.addEventListener('change', () => updatePictureField(picture.id, sectionKey, 'medium', medSel.value));
     medWrap.appendChild(medLab);
     medWrap.appendChild(medSel);
@@ -1099,9 +1221,6 @@ async function updatePictureField(pictureId, section, field, value) {
 
     picture[field] = value.trim();
 
-    // Update JSON export
-    updateJSONExport();
-
     const pictureElement = document.querySelector(`[data-picture-id="${pictureId}"]`);
     if (pictureElement) {
         if (field === 'name') {
@@ -1193,19 +1312,29 @@ async function deletePicture(pictureId, section) {
     if (index !== -1) {
         sectionArray.splice(index, 1);
         
-        // Try to update on GitHub if token is configured
+        // Auto-save to GitHub (JSON + HTML) if token is configured — same path as Edit
         if (hasGitHubToken()) {
             try {
                 await updateGalleryDataOnGitHub(galleryData);
-                alert('Picture deleted and gallery-data.json updated on GitHub.');
+                const generatedHTMLs = callHTMLGenerator(galleryData);
+                for (const sectionId of Object.keys(generatedHTMLs)) {
+                    try {
+                        const file = generatedHTMLs[sectionId];
+                        await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
+                    } catch (error) {
+                        console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
+                    }
+                }
+                showPanelToast('Picture deleted and saved to GitHub.', false);
             } catch (error) {
-                alert(`Picture deleted locally, but failed to update GitHub: ${error.message}. Please copy the JSON below and commit manually.`);
+                showPanelToast('Picture deleted locally, but could not save to GitHub: ' + (error.message || String(error)), true);
             }
+        } else {
+            showPanelToast('Picture deleted locally. Configure a GitHub token to publish changes.', true);
         }
         
         // Update display
         renderPicturesList();
-        updateJSONExport();
     }
 }
 
@@ -1228,85 +1357,6 @@ function showSection(section, clickedButton) {
 }
 
 // ============================================================================
-// JSON EXPORT
-// ============================================================================
-
-// Update the JSON export textarea
-function updateJSONExport() {
-    const jsonOutput = document.getElementById('jsonOutput');
-    if (!jsonOutput) {
-        console.warn('jsonOutput textarea missing; skipping JSON export update.');
-        return;
-    }
-    jsonOutput.value = JSON.stringify(galleryData, null, 2);
-}
-
-// Copy JSON to clipboard
-function copyJSON() {
-    const jsonOutput = document.getElementById('jsonOutput');
-    const copyMessage = document.getElementById('copyMessage');
-    
-    jsonOutput.select();
-    jsonOutput.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-        document.execCommand('copy');
-        copyMessage.innerHTML = '<div class="success-message">JSON copied to clipboard!</div>';
-        setTimeout(() => {
-            copyMessage.innerHTML = '';
-        }, 3000);
-    } catch (err) {
-        copyMessage.innerHTML = '<div class="error-message">Failed to copy. Please select and copy manually.</div>';
-    }
-}
-
-// Save JSON directly to GitHub (if token is configured) - NOW AUTOMATICALLY GENERATES HTML TOO
-async function saveJSONToGitHub() {
-    const copyMessage = document.getElementById('copyMessage');
-    
-    if (!hasGitHubToken()) {
-        copyMessage.innerHTML = '<div class="error-message">GitHub token not configured. Please set it in Settings first.</div>';
-        return;
-    }
-    
-    try {
-        copyMessage.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Saving JSON and generating HTML files... Please wait.</div>';
-        
-        // Step 1: Save JSON
-        await updateGalleryDataOnGitHub(galleryData);
-        
-        // Step 2: Automatically generate and save HTML files
-        const generatedHTMLs = callHTMLGenerator(galleryData);
-        const htmlFiles = Object.keys(generatedHTMLs);
-        let savedCount = 0;
-        let errorCount = 0;
-        
-        for (const sectionId of htmlFiles) {
-            try {
-                const file = generatedHTMLs[sectionId];
-                await updateGitHubFile(file.filename, file.html, `Auto-update ${file.filename} from control panel`);
-                savedCount++;
-            } catch (error) {
-                console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
-                errorCount++;
-            }
-        }
-        
-        if (errorCount === 0) {
-            copyMessage.innerHTML = `<div class="success-message">✅ Successfully saved gallery-data.json and ${savedCount} HTML file(s) to GitHub!</div>`;
-        } else {
-            copyMessage.innerHTML = `<div class="success-message">✅ Saved gallery-data.json and ${savedCount} HTML file(s). ${errorCount} file(s) failed to save.</div>`;
-        }
-        
-        setTimeout(() => {
-            copyMessage.innerHTML = '';
-        }, 8000);
-    } catch (error) {
-        copyMessage.innerHTML = `<div class="error-message">Failed to save to GitHub: ${error.message}. Please copy and commit manually.</div>`;
-    }
-}
-
-// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
@@ -1318,169 +1368,8 @@ function escapeHtml(text) {
 }
 
 // ============================================================================
-// HTML GENERATION
+// HTML GENERATION (used automatically by Add / Edit / Delete)
 // ============================================================================
-
-// Generate all HTML files from current gallery data
-async function generateAllHTML() {
-    const messageDiv = document.getElementById('htmlGenerationMessage');
-    const previewSection = document.getElementById('htmlPreviewSection');
-    const filesList = document.getElementById('htmlFilesList');
-    
-    if (!galleryData || !galleryData.sections) {
-        messageDiv.innerHTML = '<div class="error-message">No gallery data loaded. Please refresh the page.</div>';
-        return;
-    }
-    
-    try {
-        messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Generating HTML files... Please wait.</div>';
-        
-        // Generate HTML for all sections
-        const generatedHTMLs = callHTMLGenerator(galleryData);
-        const fileCount = Object.keys(generatedHTMLs).length;
-        
-        // Display preview
-        let filesHTML = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
-        Object.keys(generatedHTMLs).forEach(sectionId => {
-            const file = generatedHTMLs[sectionId];
-            filesHTML += `
-                <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 4px;">
-                    <h4 style="margin: 0 0 0.5rem 0; color: #169B62;">${file.filename}</h4>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                        <button type="button" class="btn" onclick="copyHTMLToClipboard('${sectionId}')" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Copy HTML</button>
-                        <button type="button" class="btn" onclick="saveHTMLToGitHub('${sectionId}')" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Save to GitHub</button>
-                    </div>
-                </div>`;
-        });
-        filesHTML += '</div>';
-        
-        filesList.innerHTML = filesHTML;
-        previewSection.style.display = 'block';
-        
-        // Store generated HTMLs globally for access by copy/save functions
-        window.generatedHTMLs = generatedHTMLs;
-        
-        messageDiv.innerHTML = `<div class="success-message">Successfully generated ${fileCount} HTML file(s)! Use the buttons below to copy or save to GitHub.</div>`;
-        
-    } catch (error) {
-        messageDiv.innerHTML = `<div class="error-message">Error generating HTML: ${error.message}</div>`;
-        console.error('HTML generation error:', error);
-    }
-}
-
-// Preview generated HTML (same as generate, but shows in modal/textarea)
-function previewGeneratedHTML() {
-    generateAllHTML();
-}
-
-// Regenerate all HTML files and save to GitHub
-async function regenerateAllHTML() {
-    const messageDiv = document.getElementById('regenerateMessage');
-    const btn = document.getElementById('regenerateHTMLBtn');
-    
-    if (!hasGitHubToken()) {
-        messageDiv.innerHTML = '<div class="error-message">GitHub token not configured. Please set it in Settings first.</div>';
-        return;
-    }
-    
-    if (!galleryData || !galleryData.sections) {
-        messageDiv.innerHTML = '<div class="error-message">No gallery data loaded. Please refresh the page.</div>';
-        return;
-    }
-    
-    try {
-        btn.disabled = true;
-        btn.textContent = 'Regenerating... Please wait';
-        messageDiv.innerHTML = '<div style="color: #169B62; padding: 0.75rem;">Regenerating all HTML files from current JSON... Please wait.</div>';
-        
-        // Generate HTML for all sections
-        const generatedHTMLs = callHTMLGenerator(galleryData);
-        const htmlFiles = Object.keys(generatedHTMLs);
-        let savedCount = 0;
-        let errorCount = 0;
-        
-        for (const sectionId of htmlFiles) {
-            try {
-                const file = generatedHTMLs[sectionId];
-                await updateGitHubFile(file.filename, file.html, `Regenerate ${file.filename} from control panel`);
-                savedCount++;
-            } catch (error) {
-                console.error(`Failed to save ${generatedHTMLs[sectionId].filename}:`, error);
-                errorCount++;
-            }
-        }
-        
-        if (errorCount === 0) {
-            messageDiv.innerHTML = `<div class="success-message">✅ Successfully regenerated and saved ${savedCount} HTML file(s) to GitHub!</div>`;
-        } else {
-            messageDiv.innerHTML = `<div class="success-message">✅ Regenerated ${savedCount} HTML file(s). ${errorCount} file(s) failed to save.</div>`;
-        }
-        
-        setTimeout(() => {
-            messageDiv.innerHTML = '';
-        }, 8000);
-    } catch (error) {
-        messageDiv.innerHTML = `<div class="error-message">Error regenerating HTML: ${error.message}</div>`;
-        console.error('HTML regeneration error:', error);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '🔄 Regenerate All HTML Files';
-    }
-}
-
-// Copy HTML to clipboard
-function copyHTMLToClipboard(sectionId) {
-    if (!window.generatedHTMLs || !window.generatedHTMLs[sectionId]) {
-        alert('Please generate HTML files first.');
-        return;
-    }
-    
-    const html = window.generatedHTMLs[sectionId].html;
-    const textarea = document.createElement('textarea');
-    textarea.value = html;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    
-    try {
-        document.execCommand('copy');
-        alert(`HTML for ${sectionId}.html copied to clipboard!`);
-    } catch (err) {
-        alert('Failed to copy. Please select and copy manually.');
-    }
-    
-    document.body.removeChild(textarea);
-}
-
-// Save HTML file to GitHub
-async function saveHTMLToGitHub(sectionId) {
-    if (!window.generatedHTMLs || !window.generatedHTMLs[sectionId]) {
-        alert('Please generate HTML files first.');
-        return;
-    }
-    
-    if (!hasGitHubToken()) {
-        alert('GitHub token not configured. Please set it in Settings first.');
-        return;
-    }
-    
-    const file = window.generatedHTMLs[sectionId];
-    const messageDiv = document.getElementById('htmlGenerationMessage');
-    
-    try {
-        messageDiv.innerHTML = `<div style="color: #169B62; padding: 0.75rem;">Saving ${file.filename} to GitHub... Please wait.</div>`;
-        
-        await updateGitHubFile(file.filename, file.html, `Update ${file.filename} from control panel`);
-        
-        messageDiv.innerHTML = `<div class="success-message">${file.filename} successfully saved to GitHub!</div>`;
-        setTimeout(() => {
-            messageDiv.innerHTML = '';
-        }, 5000);
-    } catch (error) {
-        messageDiv.innerHTML = `<div class="error-message">Failed to save ${file.filename}: ${error.message}</div>`;
-    }
-}
 
 // Helper function to call the HTML generator from html-generator.js
 // IMPORTANT: We do NOT define a function named generateAllGalleryHTMLs here

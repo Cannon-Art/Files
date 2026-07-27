@@ -236,36 +236,46 @@ body {
     background-color: #000;
     color: #fff;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
     min-height: 160px; /* ~20% less than 200px */
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .hero .container {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 1.6rem 20px; /* ~20% less vertical padding than 2rem */
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.25rem 0;
     box-sizing: border-box;
+    gap: 0.5rem;
+    text-align: center;
 }
 
 .hero-title {
     font-family: 'Old English Text MT', 'UnifrakturMaguntia', 'Blackletter', cursive;
-    font-size: 2.2rem; /* Reduced to be smaller than header */
+    font-size: 2.42rem; /* +10% from 2.2rem */
     font-weight: 700;
-    margin: 0 0 0.8rem 0; /* tighter gap to subtitle for vertical balance */
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
 }
 
 .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.32rem; /* +10% from 1.2rem */
     font-weight: 300;
     opacity: 0.9;
-    margin: 0;
+    margin: 0 auto;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    align-self: center;
 }
 
 /* Section Titles */
@@ -502,7 +512,7 @@ body {
 }
 
 .about-content p {
-    font-size: 1.1rem;
+    font-size: 1.21rem; /* +10% from 1.1rem */
     margin-bottom: 1.5rem;
     color: #555;
     line-height: 1.8;
@@ -521,7 +531,7 @@ body {
 }
 
 .contact-content p {
-    font-size: 1.1rem;
+    font-size: 1.21rem; /* +10% from 1.1rem */
     margin-bottom: 1.5rem;
     color: #555;
 }
@@ -638,11 +648,11 @@ body {
     }
     
     .hero-title {
-        font-size: 2rem;
+        font-size: 2.2rem; /* +10% from 2rem */
     }
     
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 1.1rem; /* +10% from 1rem */
     }
     
     .section-title {
@@ -686,14 +696,15 @@ body {
     
     .hero {
         min-height: 120px; /* ~20% less than 150px */
+        padding: 0 15px;
     }
     
     .hero .container {
-        padding: 1.2rem 15px; /* ~20% less than 1.5rem */
+        padding: 1rem 0;
     }
     
     .hero-title {
-        font-size: 1.8rem;
+        font-size: 1.98rem; /* +10% from 1.8rem */
     }
     
     .gallery, .about, .contact {
