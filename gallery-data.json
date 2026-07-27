@@ -36,16 +36,7 @@
         "year": "2026"
       }
     ],
-    "music-legends": [
-      {
-        "id": "music-001",
-        "name": "Monday Test",
-        "imageUrl": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/monday_test.png",
-        "medium": "Acrylic",
-        "notes": "testing github deploy",
-        "year": "2029"
-      }
-    ],
+    "music-legends": [],
     "recovery-art": [
       {
         "id": "recovery-001",
