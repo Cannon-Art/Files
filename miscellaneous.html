@@ -137,7 +137,7 @@
                                 <button class="expand-notes-btn">... read more</button>
                             </div>
                             <div class="notes-full" style="display: none;">
-                                <p class="notes-text-full">Stingy Jack was a drunkard long ago. It was said that Jack was a beastly man, even beastlier than the devil himself – a rumour that greatly annoyed the devil. Outraged and envious, the devil came to Jack one night to collect his soul and take him to hell. Jack was cunning however, and he managed to trick the devil.<br><br><br><br>As a last request, Jack asked the devil to pick an apple from a tree for him. The devil, seeing no problem with this, climbed up the tree to pick an apple for Jack. As soon as the devil was up in the tree however, Jack quickly placed a ring of crucifixes around it, trapping the devil.<br><br><br><br>Furious, the devil demanded to be set free immediately. Jack cockily countered that he would only let him go provided that his soul would never go to hell. The devil acceded to his condition and Jack set him free.<br><br><br><br>When Stingy Jack eventually died years later, he wasn't admitted into heaven due to all the sins he had committed during his life. When he reached the gates of hell, the devil wouldn't accept his soul either, staying true to the promise he had made. However, he took pity on poor Jack and tossed him a coal from hell to make a lantern for himself.<br><br><br><br>Ergo, Jack's soul was condemned to purgatory, to live out his immortality alone in the plane between heaven and hell, with nothing but a hollowed-out turnip lit with the coal the devil had given him to light his way. And so from that point on Stingy Jack was given the nickname Jack O' Lantern, or 'Seán na Gealaí'.<br><br><br><br>Whenever a will-o'-the-wisp was spotted at night it was believed to be Seán na Gealaí walking around with his lighted turnip. It became tradition for people, like Seán na Gealaí, to create lanterns of their own out of turnips and carve horrible faces into them to scare off any evil spirits. This custom carries on to this day, but with pumpkins in the place of turnips as they're much easier to carve.<br><br><br><br>Now, the next time they run out of pumpkin spice lattes at the café, maybe you should take a moment to think of poor Seán na Gealaí, and remember that you don't have it nearly as bad as him!<br><br><br><br>Source: https://www.gaelchultur.com/en/blog/the-origin-of-the-jack-o-lantern</p>
+                                <p class="notes-text-full">Stingy Jack was a drunkard long ago. It was said that Jack was a beastly man, even beastlier than the devil himself – a rumour that greatly annoyed the devil. Outraged and envious, the devil came to Jack one night to collect his soul and take him to hell. Jack was cunning however, and he managed to trick the devil.<br><br><br><br>As a last request, Jack asked the devil to pick an apple from a tree for him. The devil, seeing no problem with this, climbed up the tree to pick an apple for Jack. As soon as the devil was up in the tree however, Jack quickly placed a ring of crucifixes around it, trapping the devil.<br><br><br><br>Furious, the devil demanded to be set free immediately. Jack cockily countered that he would only let him go provided that his soul would never go to hell. The devil acceded to his condition and Jack set him free.<br><br><br><br>When Stingy Jack eventually died years later, he wasn&#039;t admitted into heaven due to all the sins he had committed during his life. When he reached the gates of hell, the devil wouldn&#039;t accept his soul either, staying true to the promise he had made. However, he took pity on poor Jack and tossed him a coal from hell to make a lantern for himself.<br><br><br><br>Ergo, Jack&#039;s soul was condemned to purgatory, to live out his immortality alone in the plane between heaven and hell, with nothing but a hollowed-out turnip lit with the coal the devil had given him to light his way. And so from that point on Stingy Jack was given the nickname Jack O&#039; Lantern, or &#039;Seán na Gealaí&#039;.<br><br><br><br>Whenever a will-o&#039;-the-wisp was spotted at night it was believed to be Seán na Gealaí walking around with his lighted turnip. It became tradition for people, like Seán na Gealaí, to create lanterns of their own out of turnips and carve horrible faces into them to scare off any evil spirits. This custom carries on to this day, but with pumpkins in the place of turnips as they&#039;re much easier to carve.<br><br><br><br>Now, the next time they run out of pumpkin spice lattes at the café, maybe you should take a moment to think of poor Seán na Gealaí, and remember that you don&#039;t have it nearly as bad as him!<br><br><br><br>Source: https://www.gaelchultur.com/en/blog/the-origin-of-the-jack-o-lantern</p>
                                 <button class="collapse-notes-btn">... read less</button>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
             <div class="container">
                 <h2 class="section-title">About This Collection</h2>
                 <div class="description-content">
-<p>This collection features a diverse range of creative expressions that don't fit into a single category. Each piece represents a unique artistic vision and creative exploration.</p>
+<p>This collection features a diverse range of creative expressions that don&#039;t fit into a single category. Each piece represents a unique artistic vision and creative exploration.</p>
                 </div>
             </div>
         </section>
@@ -255,6 +255,84 @@
                 notesFull.style.display = 'none';
             });
         });
+    </script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent">
+        <p>
+            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies.
+            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
+        </p>
+        <div class="cookie-buttons">
+            <button type="button" id="decline-cookies" class="decline-cookie">Decline</button>
+            <button type="button" id="accept-cookies" class="accept-cookie">Accept All</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('accept-cookies');
+            const declineBtn = document.getElementById('decline-cookies');
+
+            if (!localStorage.getItem('cookieConsent')) {
+                setTimeout(() => cookieConsent.classList.add('show'), 2000);
+            }
+
+            function loadAnalytics() {
+                if (window.__cannonPlausibleLoaded) return;
+                window.__cannonPlausibleLoaded = true;
+                const s = document.createElement('script');
+                s.src = 'analytics.js';
+                document.head.appendChild(s);
+            }
+
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'accepted');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                    loadAnalytics();
+                });
+            }
+
+            if (localStorage.getItem('cookieConsent') === 'accepted') {
+                loadAnalytics();
+            }
+
+            if (declineBtn) {
+                declineBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'declined');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                });
+            }
+        });
+
+        function showGDPRInfo() {
+            alert([
+                'COOKIE & PRIVACY INFORMATION',
+                '',
+                'We use cookies to:',
+                '- Analyze website traffic and visitor behavior',
+                '- Enhance your browsing experience',
+                '- Track which artworks you view and for how long',
+                '',
+                'Your Rights (GDPR):',
+                '- You can accept or decline cookies at any time',
+                '- You can request access to your data',
+                '- You can request deletion of your data',
+                '- You can withdraw consent at any time',
+                '',
+                'For data protection inquiries, contact:',
+                'Cannon Art',
+                'Email: CannonNo1@iCloud.com',
+                '',
+                'See also: Terms of Use (section 10, Privacy and Data Protection).',
+                '',
+                'Cookie preferences can be managed in your browser settings.'
+            ].join('\n'));
+        }
     </script>
 </body>
 </html>

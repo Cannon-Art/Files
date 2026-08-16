@@ -133,11 +133,11 @@
                         </div>
                         <div class="gallery-notes">
                             <div class="notes-preview">
-                                <p class="notes-text-preview">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction's constant pull—its pressure, ...</p>
+                                <p class="notes-text-preview">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction&#039;s constant pull—its pressure, ...</p>
                                 <button class="expand-notes-btn">... read more</button>
                             </div>
                             <div class="notes-full" style="display: none;">
-                                <p class="notes-text-full">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction's constant pull—its pressure, control, and refusal to let go. The figure turning forward and opening their mouth reflects an act of resistance: a choice to speak, to breathe, and to move in a different direction. The words "This way to escape the clutches of addiction" point toward hope, though not an easy escape—one that demands effort, pain, and determination. It captures a transition in which addiction is still present but no longer in control, and where reclaiming one's voice and direction marks the first step toward a life without addiction.</p>
+                                <p class="notes-text-full">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction&#039;s constant pull—its pressure, control, and refusal to let go. The figure turning forward and opening their mouth reflects an act of resistance: a choice to speak, to breathe, and to move in a different direction. The words &quot;This way to escape the clutches of addiction&quot; point toward hope, though not an easy escape—one that demands effort, pain, and determination. It captures a transition in which addiction is still present but no longer in control, and where reclaiming one&#039;s voice and direction marks the first step toward a life without addiction.</p>
                                 <button class="collapse-notes-btn">... read less</button>
                             </div>
                         </div>
@@ -255,6 +255,84 @@
                 notesFull.style.display = 'none';
             });
         });
+    </script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent">
+        <p>
+            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies.
+            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
+        </p>
+        <div class="cookie-buttons">
+            <button type="button" id="decline-cookies" class="decline-cookie">Decline</button>
+            <button type="button" id="accept-cookies" class="accept-cookie">Accept All</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('accept-cookies');
+            const declineBtn = document.getElementById('decline-cookies');
+
+            if (!localStorage.getItem('cookieConsent')) {
+                setTimeout(() => cookieConsent.classList.add('show'), 2000);
+            }
+
+            function loadAnalytics() {
+                if (window.__cannonPlausibleLoaded) return;
+                window.__cannonPlausibleLoaded = true;
+                const s = document.createElement('script');
+                s.src = 'analytics.js';
+                document.head.appendChild(s);
+            }
+
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'accepted');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                    loadAnalytics();
+                });
+            }
+
+            if (localStorage.getItem('cookieConsent') === 'accepted') {
+                loadAnalytics();
+            }
+
+            if (declineBtn) {
+                declineBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookieConsent', 'declined');
+                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
+                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
+                });
+            }
+        });
+
+        function showGDPRInfo() {
+            alert([
+                'COOKIE & PRIVACY INFORMATION',
+                '',
+                'We use cookies to:',
+                '- Analyze website traffic and visitor behavior',
+                '- Enhance your browsing experience',
+                '- Track which artworks you view and for how long',
+                '',
+                'Your Rights (GDPR):',
+                '- You can accept or decline cookies at any time',
+                '- You can request access to your data',
+                '- You can request deletion of your data',
+                '- You can withdraw consent at any time',
+                '',
+                'For data protection inquiries, contact:',
+                'Cannon Art',
+                'Email: CannonNo1@iCloud.com',
+                '',
+                'See also: Terms of Use (section 10, Privacy and Data Protection).',
+                '',
+                'Cookie preferences can be managed in your browser settings.'
+            ].join('\n'));
+        }
     </script>
 </body>
 </html>
