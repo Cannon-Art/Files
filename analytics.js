@@ -1,30 +1,19 @@
-// Analytics Integration - Only loads when user accepts cookies
-// Privacy-friendly analytics by Plausible
+// Cookie-gated analytics loader. Uses the free simple-analytics store (no Plausible).
 (function() {
     'use strict';
 
-    const cookieConsent = localStorage.getItem('cookieConsent');
-
-    if (cookieConsent !== 'accepted') {
-        return;
-    }
-
-    // Avoid double-init if analytics.js is injected more than once
-    if (window.__cannonPlausibleScriptReady) {
-        return;
-    }
-    window.__cannonPlausibleScriptReady = true;
-
-    window.plausible = window.plausible || function () {
-        (plausible.q = plausible.q || []).push(arguments);
-    };
-    plausible.init = plausible.init || function (i) {
-        plausible.o = i || {};
-    };
-    plausible.init();
+    if (localStorage.getItem('cookieConsent') !== 'accepted') return;
+    if (window.__simpleAnalyticsLoaded) return;
+    window.__simpleAnalyticsLoaded = true;
 
     const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://plausible.io/js/pa-TaheL_Itki-ZZ1_7ldtY-.js';
+    const base = document.currentScript && document.currentScript.src
+        ? document.currentScript.src
+        : location.href;
+    try {
+        script.src = new URL('simple-analytics.js', base).href;
+    } catch (e) {
+        script.src = 'simple-analytics.js';
+    }
     document.head.appendChild(script);
 })();

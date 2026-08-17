@@ -155,12 +155,37 @@ function checkControlPanelUi() {
     }
 }
 
+function checkFreeAnalytics() {
+    const analyticsJs = readFileSync(join(ROOT, 'analytics.js'), 'utf8');
+    if (analyticsJs.includes('plausible.io')) {
+        fail('analytics.js — Plausible script still present');
+    } else {
+        pass('analytics.js — Plausible removed');
+    }
+
+    const simple = readFileSync(join(ROOT, 'simple-analytics.js'), 'utf8');
+    if (!simple.includes('sendBeacon') || !simple.includes('paulcasso-website.netlify.app/.netlify/functions/analytics')) {
+        fail('simple-analytics.js — missing shared free analytics endpoint');
+    } else {
+        pass('simple-analytics.js — posts to free shared store');
+    }
+
+    const panel = readFileSync(join(ROOT, 'control-panel.html'), 'utf8');
+    if (!panel.includes('panelViewAnalytics')) {
+        fail('control-panel.html — missing Analytics tab');
+    } else {
+        pass('control-panel.html — Analytics tab present');
+    }
+}
+
 console.log('Local verify (pre-push)\n');
 checkJavaScriptSyntax();
 console.log('');
 checkGalleryData();
 console.log('');
 checkControlPanelUi();
+console.log('');
+checkFreeAnalytics();
 
 if (failures > 0) {
     console.error(`\n${failures} check(s) failed. Fix issues before pushing to GitHub.\n`);
