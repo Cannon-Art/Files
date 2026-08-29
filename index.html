@@ -25,7 +25,7 @@
     <meta property="og:url" content="https://cannon-art.github.io/Files/">
     <meta property="og:title" content="Cannon Art - Contemporary Art Gallery">
     <meta property="og:description" content="Explore Cannon Art collection featuring DC Characters, Marvel Characters, Music Legends, Recovery Art, and Miscellaneous contemporary artwork.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/The_Joker.JPG">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Marvel_Pic10.JPEG">
     <meta property="og:site_name" content="Cannon Art">
     
     <!-- Twitter -->
@@ -33,7 +33,7 @@
     <meta property="twitter:url" content="https://cannon-art.github.io/Files/">
     <meta property="twitter:title" content="Cannon Art - Contemporary Art Gallery">
     <meta property="twitter:description" content="Explore Cannon Art collection featuring DC Characters, Marvel Characters, Music Legends, Recovery Art, and Miscellaneous contemporary artwork.">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/The_Joker.JPG">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Marvel_Pic10.JPEG">
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -105,7 +105,7 @@
                 <div class="collection-grid">
                     <a href="dc-characters.html" class="collection-item">
                         <div class="collection-image-container">
-                            <img src="Art_Examples/The_Joker.JPG" alt="DC Characters Collection" class="collection-image" loading="lazy">
+                            <img src="Art_Examples/Marvel_Pic10.JPEG" alt="DC Characters Collection" class="collection-image" loading="lazy">
                             <div class="collection-overlay">
                                 <span class="collection-link-text">View Collection</span>
                             </div>
@@ -201,20 +201,7 @@
             <p class="footer-right"><img src="AvId_Digital_Small.png" alt="Avid Digital"></p>
         </div>
     </footer>
-
-    <!-- Cookie Consent Banner -->
-    <div id="cookie-consent">
-        <p>
-            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies. 
-            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
-        </p>
-        <div class="cookie-buttons">
-            <button id="decline-cookies" class="decline-cookie">Decline</button>
-            <button id="accept-cookies" class="accept-cookie">Accept All</button>
-        </div>
-    </div>
-
-    <script src="menu-script.js"></script>
+<script src="menu-script.js"></script>
     <script src="protection.js"></script>
     <script src="canvas-protection.js"></script>
     <script>
@@ -233,87 +220,7 @@
             });
         });
     </script>
-    <script>
-        // Cookie Consent Banner
-        document.addEventListener("DOMContentLoaded", function() {
-            const cookieConsent = document.getElementById('cookie-consent');
-            const acceptBtn = document.getElementById('accept-cookies');
-            const declineBtn = document.getElementById('decline-cookies');
-            
-            // Check if user has already made a choice
-            if (!localStorage.getItem('cookieConsent')) {
-                setTimeout(() => {
-                    cookieConsent.classList.add('show');
-                }, 2000);
-            }
-            
-            // Accept cookies
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'accepted');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
-                    // Load analytics after user accepts
-                    loadAnalytics();
-                });
-            }
-            
-            // Load analytics if already accepted
-            if (localStorage.getItem('cookieConsent') === 'accepted') {
-                loadAnalytics();
-            }
-            
-            // Function to load analytics
-            function loadAnalytics() {
-                if (window.__cannonPlausibleLoaded) return;
-                window.__cannonPlausibleLoaded = true;
-                const s = document.createElement('script');
-                s.src = 'analytics.js';
-                document.head.appendChild(s);
-            }
-            
-            // Decline cookies
-            if (declineBtn) {
-                declineBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'declined');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        cookieConsent.classList.remove('show');
-                    }, 500);
-                });
-            }
-        });
-        
-        // GDPR Contact Information
-        function showGDPRInfo() {
-            const gdprInfo = `
-COOKIE & PRIVACY INFORMATION
-
-We use cookies to:
-- Analyze website traffic and visitor behavior
-- Enhance your browsing experience
-- Track which artworks you view and for how long
-
-Your Rights (GDPR):
-- You can accept or decline cookies at any time
-- You can request access to your data
-- You can request deletion of your data
-- You can withdraw consent at any time
-
-For data protection inquiries, requests to access your data, or to exercise your GDPR rights, please contact:
-
-Data Protection Officer:
-Cannon Art
-Email: CannonNo1@iCloud.com
-
-See also: Terms of Use (section 10, Privacy and Data Protection).
-
-Cookie preferences can be managed in your browser settings.
-            `;
-            alert(gdprInfo);
-        }
-    </script>
+    <!-- 100% privacy-first analytics -->
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
 </html>

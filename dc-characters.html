@@ -56,18 +56,6 @@
                 },
                 "artMedium": "Mixed Media",
                 "copyrightYear": "2026"
-            },
-            {
-                "@type": "VisualArtwork",
-                "position": 2,
-                "name": "The Joker",
-                "image": "https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/The_Joker.JPG",
-                "creator": {
-                    "@type": "Person",
-                    "name": "Cannon Art"
-                },
-                "artMedium": "Mixed Media",
-                "copyrightYear": "2026"
             }
         ]
     }
@@ -140,18 +128,6 @@
                                 <p class="notes-text-full">This picture shows different versions of the same character, &quot;The Joker&quot;, each with a different expression. Together, they suggest a mind that is split and unsettled. The repeated laughing in the background gives a feeling of noise and pressure, like thoughts that won&#039;t quiet down and keep mocking or pushing from inside.<br><br><br><br>Looking at each portrayal of the Joker character, the image reflects someone struggling with their own darker thoughts and behaviours. Each face represents a different side of that struggle—anger, false confidence, loss of control, or emotional numbness. Instead of being one clear, steady person, they appear pulled in different directions by these inner voices. The picture shows how losing a sense of self can feel confusing and overwhelming, as if the person is surrounded by versions of themselves that make it harder to stay grounded or at peace.</p>
                                 <button class="collapse-notes-btn">... read less</button>
                             </div>
-                        </div>
-                    </div>
-                    <div class="gallery-item">
-                        <div class="gallery-image-container">
-                            <img src="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/The_Joker.JPG" alt="The Joker" class="gallery-image">
-                            <div class="gallery-overlay">
-                                <button class="view-btn">View Full Size</button>
-                            </div>
-                        </div>
-                        <div class="gallery-info">
-                            <h3 class="gallery-title">The Joker (2026)</h3>
-                            <p class="gallery-medium">Mixed Media</p>
                         </div>
                     </div>
                 </div>
@@ -258,82 +234,7 @@
         });
     </script>
 
-    <!-- Cookie Consent Banner -->
-    <div id="cookie-consent">
-        <p>
-            We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept All", you consent to our use of cookies.
-            <a href="#" onclick="showGDPRInfo(); return false;">Learn more</a>
-        </p>
-        <div class="cookie-buttons">
-            <button type="button" id="decline-cookies" class="decline-cookie">Decline</button>
-            <button type="button" id="accept-cookies" class="accept-cookie">Accept All</button>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const cookieConsent = document.getElementById('cookie-consent');
-            const acceptBtn = document.getElementById('accept-cookies');
-            const declineBtn = document.getElementById('decline-cookies');
-
-            if (!localStorage.getItem('cookieConsent')) {
-                setTimeout(() => cookieConsent.classList.add('show'), 2000);
-            }
-
-            function loadAnalytics() {
-                if (window.__cannonPlausibleLoaded) return;
-                window.__cannonPlausibleLoaded = true;
-                const s = document.createElement('script');
-                s.src = 'analytics.js';
-                document.head.appendChild(s);
-            }
-
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'accepted');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
-                    loadAnalytics();
-                });
-            }
-
-            if (localStorage.getItem('cookieConsent') === 'accepted') {
-                loadAnalytics();
-            }
-
-            if (declineBtn) {
-                declineBtn.addEventListener('click', function() {
-                    localStorage.setItem('cookieConsent', 'declined');
-                    cookieConsent.style.animation = 'slideUp 0.5s ease-out reverse';
-                    setTimeout(() => cookieConsent.classList.remove('show'), 500);
-                });
-            }
-        });
-
-        function showGDPRInfo() {
-            alert([
-                'COOKIE & PRIVACY INFORMATION',
-                '',
-                'We use cookies to:',
-                '- Analyze website traffic and visitor behavior',
-                '- Enhance your browsing experience',
-                '- Track which artworks you view and for how long',
-                '',
-                'Your Rights (GDPR):',
-                '- You can accept or decline cookies at any time',
-                '- You can request access to your data',
-                '- You can request deletion of your data',
-                '- You can withdraw consent at any time',
-                '',
-                'For data protection inquiries, contact:',
-                'Cannon Art',
-                'Email: CannonNo1@iCloud.com',
-                '',
-                'See also: Terms of Use (section 10, Privacy and Data Protection).',
-                '',
-                'Cookie preferences can be managed in your browser settings.'
-            ].join('\n'));
-        }
-    </script>
+    <!-- 100% privacy-first analytics -->
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
 </html>

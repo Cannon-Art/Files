@@ -4,14 +4,28 @@
 (function() {
     'use strict';
 
+    function isEditableElement(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+        if (el.isContentEditable) return true;
+        return Boolean(el.closest && el.closest('input, textarea, select, [contenteditable="true"]'));
+    }
+
+    function isEditableTarget(e) {
+        return isEditableElement(e.target) || isEditableElement(document.activeElement);
+    }
+
     // Disable right-click context menu
     document.addEventListener('contextmenu', function(e) {
+        if (isEditableTarget(e)) return;
         e.preventDefault();
         return false;
     });
 
     // Disable text selection
     document.addEventListener('selectstart', function(e) {
+        if (isEditableTarget(e)) return;
         e.preventDefault();
         return false;
     });
@@ -48,21 +62,25 @@
         }
         // Disable Ctrl+A (Select All)
         if (e.ctrlKey && e.key === 'a') {
+            if (isEditableTarget(e)) return;
             e.preventDefault();
             return false;
         }
         // Disable Ctrl+C (Copy)
         if (e.ctrlKey && e.key === 'c') {
+            if (isEditableTarget(e)) return;
             e.preventDefault();
             return false;
         }
         // Disable Ctrl+X (Cut)
         if (e.ctrlKey && e.key === 'x') {
+            if (isEditableTarget(e)) return;
             e.preventDefault();
             return false;
         }
         // Disable Ctrl+V (Paste)
         if (e.ctrlKey && e.key === 'v') {
+            if (isEditableTarget(e)) return;
             e.preventDefault();
             return false;
         }
@@ -121,6 +139,7 @@
 
     // Disable copy via mouse selection
     document.addEventListener('copy', function(e) {
+        if (isEditableTarget(e)) return;
         e.clipboardData.setData('text/plain', '');
         e.preventDefault();
         return false;
@@ -128,6 +147,7 @@
 
     // Disable cut
     document.addEventListener('cut', function(e) {
+        if (isEditableTarget(e)) return;
         e.clipboardData.setData('text/plain', '');
         e.preventDefault();
         return false;
@@ -135,6 +155,7 @@
 
     // Disable paste
     document.addEventListener('paste', function(e) {
+        if (isEditableTarget(e)) return;
         e.preventDefault();
         return false;
     });

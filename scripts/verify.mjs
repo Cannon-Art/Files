@@ -77,6 +77,16 @@ function checkGalleryData() {
     }
     pass('gallery-data.json — structure OK');
 
+    const dc = data.sections['dc-characters'] || [];
+    if (!dc.some((pic) => pic && pic.name === 'The Joker - Multiple Expressions')) {
+        fail('gallery-data.json — DC Characters missing The Joker - Multiple Expressions');
+    }
+    if (dc.some((pic) => pic && (pic.name === 'The Joker' || String(pic.imageUrl || '').includes('The_Joker.JPG')))) {
+        fail('gallery-data.json — DC Characters still includes The Joker artwork');
+    } else {
+        pass('gallery-data.json — DC Characters uses Multiple Expressions only');
+    }
+
     for (const key of REQUIRED_SECTIONS) {
         const arr = data.sections[key];
         if (!Array.isArray(arr)) continue;
@@ -120,6 +130,9 @@ function checkControlPanelUi() {
     if (!html.includes('Edit Existing Pictures')) {
         fail('control-panel.html — missing Edit Existing Pictures section');
     }
+    if (!html.includes('id="usernameInput"')) {
+        fail('control-panel.html — missing username login field');
+    }
     if (!html.includes('Token Admin') || !html.includes('panelViewDelete')) {
         fail('control-panel.html — missing panel submenu views');
     }
@@ -135,6 +148,11 @@ function checkControlPanelUi() {
         js = readFileSync(jsPath, 'utf8');
     } catch (e) {
         fail(`control-panel.js — ${e.message}`);
+        return;
+    }
+
+    if (!js.includes('ADMIN_ACCOUNTS') || !js.includes('liam1davis@icloud.com') || !js.includes('cannonno1@icloud.com') || !js.includes('isAllowedAdminLogin')) {
+        fail('control-panel.js — hardcoded admin username/password access control missing');
         return;
     }
 
@@ -175,6 +193,60 @@ function checkFreeAnalytics() {
         fail('control-panel.html — missing Analytics tab');
     } else {
         pass('control-panel.html — Analytics tab present');
+    }
+
+    const generator = readFileSync(join(ROOT, 'html-generator.js'), 'utf8');
+    if (!generator.includes('scripts.simpleanalyticscdn.com/latest.js') || generator.includes('id="cookie-consent"')) {
+        fail('html-generator.js — should emit official Simple Analytics and no cookie banner');
+    } else {
+        pass('html-generator.js — official Simple Analytics, no cookie banner');
+    }
+
+    const publicPages = [
+        'index.html',
+        'control-panel.html',
+        'miscellaneous.html',
+        'music-legends.html',
+        'recovery-art.html',
+        'marvel-characters.html',
+        'dc-characters.html',
+        'the-who.html',
+        'rolling-stones.html',
+        'terms-of-use.html',
+        'batman.html'
+    ];
+    let analyticsOk = true;
+    for (const name of publicPages) {
+        const html = readFileSync(join(ROOT, name), 'utf8');
+        if (html.includes('id="cookie-consent"')) {
+            fail(`${name} — cookie consent banner still present`);
+            analyticsOk = false;
+        }
+        if (!html.includes('scripts.simpleanalyticscdn.com/latest.js')) {
+            fail(`${name} — missing official Simple Analytics script`);
+            analyticsOk = false;
+        }
+    }
+    if (analyticsOk) {
+        pass('public pages — official Simple Analytics, no cookie banner');
+    }
+
+    const indexHtml = readFileSync(join(ROOT, 'index.html'), 'utf8');
+    if (indexHtml.includes('Art_Examples/The_Joker.JPG')) {
+        fail('index.html — DC Characters gallery card still uses The Joker image');
+    } else if (!indexHtml.includes('Art_Examples/Marvel_Pic10.JPEG')) {
+        fail('index.html — DC Characters gallery card missing Multiple Expressions image');
+    } else {
+        pass('index.html — DC Characters card uses Multiple Expressions');
+    }
+
+    const dcHtml = readFileSync(join(ROOT, 'dc-characters.html'), 'utf8');
+    if (dcHtml.includes('The_Joker.JPG') || dcHtml.includes('The Joker (2026)')) {
+        fail('dc-characters.html — The Joker artwork is still in the collection');
+    } else if (!dcHtml.includes('The Joker - Multiple Expressions')) {
+        fail('dc-characters.html — missing The Joker - Multiple Expressions');
+    } else {
+        pass('dc-characters.html — collection shows Multiple Expressions only');
     }
 }
 
