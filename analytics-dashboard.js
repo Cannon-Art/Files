@@ -1,4 +1,4 @@
-// Renders the Admin → Analytics dashboard from the free Netlify store.
+// Renders the Admin → Analytics dashboard from the stored analytics endpoint.
 (function() {
     'use strict';
 
@@ -85,7 +85,7 @@
                 ${rowsFromMap(totals.screens)}
             `;
         } catch (e) {
-            root.innerHTML = `<p class="error-message">Could not load analytics yet. After the Netlify deploy finishes, refresh this tab. ${escapeHtml(e.message || '')}</p>`;
+            root.innerHTML = `<p class="error-message">${escapeHtml(e.message || 'Could not load analytics.')}</p>`;
         }
     };
 })();
