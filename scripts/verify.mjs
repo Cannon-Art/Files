@@ -196,7 +196,7 @@ function checkFreeAnalytics() {
     }
 
     const generator = readFileSync(join(ROOT, 'html-generator.js'), 'utf8');
-    if (!generator.includes('scripts.simpleanalyticscdn.com/latest.js') || generator.includes('id="cookie-consent"')) {
+    if (!generator.includes('scripts.simpleanalyticscdn.com/latest.js') || !generator.includes('data-hostname="cannon-art.uk.eu.org"') || generator.includes('id="cookie-consent"')) {
         fail('html-generator.js — should emit official Simple Analytics and no cookie banner');
     } else {
         pass('html-generator.js — official Simple Analytics, no cookie banner');
@@ -229,6 +229,40 @@ function checkFreeAnalytics() {
     }
     if (analyticsOk) {
         pass('public pages — official Simple Analytics, no cookie banner');
+    }
+
+    const dash = readFileSync(join(ROOT, 'analytics-dashboard.js'), 'utf8');
+    if (!dash.includes('cannon-art.uk.eu.org') || !dash.includes('simpleanalytics.com/')) {
+        fail('analytics-dashboard.js — not reading Cannon Art Simple Analytics');
+    } else if (dash.includes('paulcasso-website.netlify.app')) {
+        fail('analytics-dashboard.js — still using old Netlify store URL');
+    } else {
+        pass('analytics-dashboard.js — Simple Analytics for cannon-art.uk.eu.org');
+    }
+
+    const panelJs = readFileSync(join(ROOT, 'control-panel.js'), 'utf8');
+    if (!panelJs.includes('function saveSimpleAnalyticsKeys')) {
+        fail('control-panel.js — missing Simple Analytics key save');
+    } else {
+        pass('control-panel.js — Simple Analytics keys can be saved');
+    }
+
+    if (!panel.includes('saveSimpleAnalyticsKeys()')) {
+        fail('control-panel.html — missing Simple Analytics Token Admin controls');
+    } else {
+        pass('control-panel.html — Simple Analytics Token Admin present');
+    }
+
+    let hostnameOk = true;
+    for (const name of publicPages) {
+        const html = readFileSync(join(ROOT, name), 'utf8');
+        if (!html.includes('data-hostname="cannon-art.uk.eu.org"')) {
+            fail(`${name} — Simple Analytics missing cannon-art.uk.eu.org hostname`);
+            hostnameOk = false;
+        }
+    }
+    if (hostnameOk) {
+        pass('public pages — Simple Analytics hostname is cannon-art.uk.eu.org');
     }
 
     const indexHtml = readFileSync(join(ROOT, 'index.html'), 'utf8');

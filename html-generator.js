@@ -77,7 +77,7 @@ function escapeHtml(text) {
 function getSimpleAnalyticsMarkup() {
     return `
     <!-- 100% privacy-first analytics -->
-    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>`;
+    <script async data-hostname="cannon-art.uk.eu.org" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>`;
 }
 
 /**
