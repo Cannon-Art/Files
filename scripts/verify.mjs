@@ -396,8 +396,20 @@ function checkSeo() {
     if (noindexOk) pass('control panel and terms pages — kept out of search results');
 
     const sitemap = readFileSync(join(ROOT, 'sitemap.xml'), 'utf8');
-    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     let sitemapOk = true;
+    if (sitemap.charCodeAt(0) === 0xfeff || !sitemap.startsWith('<?xml')) {
+        fail('sitemap.xml — must start with an XML declaration and have no BOM');
+        sitemapOk = false;
+    }
+    if (sitemap.includes('<!--')) {
+        fail('sitemap.xml — comments can make Google report Sitemap could not be read');
+        sitemapOk = false;
+    }
+    if (!sitemap.includes('<urlset') || (sitemap.match(/<loc>/g) || []).length < INDEXABLE_PAGES.length) {
+        fail('sitemap.xml — XML structure is incomplete');
+        sitemapOk = false;
+    }
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     for (const loc of locs) {
         if (!loc.startsWith(`${SITE_ORIGIN}/`)) {
             fail(`sitemap.xml — "${loc}" is not on ${SITE_ORIGIN}`);

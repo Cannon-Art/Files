@@ -1,47 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    Lists every page that should appear in search results, using the canonical
-    cannon-art.uk.eu.org address. Pages carrying a "noindex" tag are left out on
-    purpose: terms-of-use.html and control-panel.html.
-
-    changefreq and priority are omitted because Google ignores both.
-    Keep lastmod honest - update it when a page's content actually changes.
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>https://cannon-art.uk.eu.org/</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/dc-characters.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/batman.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/marvel-characters.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/music-legends.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/the-who.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/rolling-stones.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/recovery-art.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-        <loc>https://cannon-art.uk.eu.org/miscellaneous.html</loc>
-        <lastmod>2026-09-16</lastmod>
-    </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/dc-characters.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/batman.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/marvel-characters.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/music-legends.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/the-who.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/rolling-stones.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/recovery-art.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://cannon-art.uk.eu.org/miscellaneous.html</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
 </urlset>
