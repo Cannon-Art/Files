@@ -3,10 +3,13 @@
 User-agent: *
 Allow: /
 
-# Disallow unnecessary files
+# Superseded copies of live pages, kept for reference only.
 Disallow: /Archive/
 
-# Sitemap location
-Sitemap: https://cannon-art.github.io/Files/sitemap.xml
+# Working notes and source data that are not pages.
+Disallow: /Development/
+Disallow: /Test%20pics/
 
-
+# The sitemap must be an absolute URL on the canonical domain. It previously
+# pointed at cannon-art.github.io, which redirects here.
+Sitemap: https://cannon-art.uk.eu.org/sitemap.xml

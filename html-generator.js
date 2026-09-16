@@ -3,6 +3,11 @@
  * Generates HTML files from gallery-data.json
  */
 
+// The address search engines should treat as the real site. It must match the
+// CNAME file: cannon-art.github.io and the www subdomain both redirect here, so
+// pointing canonical or social tags at either would name a URL that redirects.
+const SITE_ORIGIN = 'https://cannon-art.uk.eu.org';
+
 // Section metadata - titles, descriptions, etc.
 const SECTION_METADATA = {
     'dc-characters': {
@@ -98,18 +103,28 @@ function getPreviewText(text) {
 }
 
 /**
- * Generate gallery item HTML for a single picture
+ * Generate gallery item HTML for a single picture.
+ *
+ * The first artwork is the one visible when the page opens and is usually the
+ * Largest Contentful Paint element, so it is fetched eagerly at high priority.
+ * Lazy-loading it would delay the paint the page is measured on. Everything
+ * below the fold is lazy so it does not compete for bandwidth.
  */
-function generateGalleryItem(picture) {
+function generateGalleryItem(picture, index) {
     const hasNotes = picture.notes && picture.notes.trim().length > 0;
     const previewText = hasNotes ? getPreviewText(picture.notes) : '';
     const fullNotes = hasNotes ? nl2br(escapeHtml(picture.notes)) : '';
     const yearDisplay = picture.year ? ` (${picture.year})` : '';
-    
+    const loadingAttrs = index === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
+    // 1600x1200 matches the 4:3 thumbnail frame in CSS. Using the display
+    // ratio (not each file's native pixels) means the card is reserved at
+    // first paint, so the page does not jump when the picture arrives.
+    const sizeAttrs = 'width="1600" height="1200"';
+
     let html = `
                     <div class="gallery-item">
                         <div class="gallery-image-container">
-                            <img src="${escapeHtml(picture.imageUrl)}" alt="${escapeHtml(picture.name)}" class="gallery-image">
+                            <img src="${escapeHtml(picture.imageUrl)}" alt="${escapeHtml(picture.name)}" class="gallery-image" ${sizeAttrs} ${loadingAttrs}>
                             <div class="gallery-overlay">
                                 <button class="view-btn">View Full Size</button>
                             </div>
@@ -144,7 +159,7 @@ function generateGalleryItem(picture) {
  */
 function generateGalleryHTML(sectionId, pictures, metadata) {
     const fileName = `${sectionId}.html`;
-    const url = `https://cannon-art.github.io/Files/${fileName}`;
+    const url = `${SITE_ORIGIN}/${fileName}`;
     const imageUrl = pictures.length > 0 ? pictures[0].imageUrl : 'https://raw.githubusercontent.com/Cannon-Art/Files/CannonArt-patch-1/OIP.jpg';
     
     // Generate gallery items HTML
@@ -155,8 +170,8 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
                         <p class="empty-message">New artwork coming soon...</p>
                     </div>`;
     } else {
-        pictures.forEach(picture => {
-            galleryItemsHTML += generateGalleryItem(picture);
+        pictures.forEach((picture, index) => {
+            galleryItemsHTML += generateGalleryItem(picture, index);
         });
     }
     
@@ -195,7 +210,6 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
     <!-- Primary Meta Tags -->
     <title>${escapeHtml(metadata.title)}</title>
@@ -232,14 +246,14 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=17">
-    <link rel="stylesheet" href="gallery-styles.css?v=18">
+    <link rel="stylesheet" href="styles.css?v=18">
+    <link rel="stylesheet" href="gallery-styles.css?v=19">
 </head>
 <body>
     <header class="header">
         <div class="container header-container">
-            <h1 class="logo">Cannon Art</h1>
-            <button class="menu-toggle" id="menuToggle">Menu</button>
+            <a href="index.html" class="logo">Cannon Art</a>
+            <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mainNav">Menu</button>
             <nav class="nav" id="mainNav">
                 <div class="nav-item">
                     <a href="index.html" class="nav-link">Home</a>
@@ -267,7 +281,7 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
     <main class="main">
         <section class="hero">
             <div class="container">
-                <h2 class="hero-title">${escapeHtml(metadata.heroTitle)}</h2>
+                <h1 class="hero-title">${escapeHtml(metadata.heroTitle)}</h1>
                 <p class="hero-subtitle">${escapeHtml(metadata.heroSubtitle)}</p>
             </div>
         </section>
@@ -301,7 +315,7 @@ ${descriptionHTML.trim()}
     <footer class="footer">
         <div class="container footer-content">
             <p class="footer-left">&copy; <span class="copyright-year">2026</span> Cannon Art | All Rights Reserved | <a href="terms-of-use.html" style="color: #00BFFF; font-weight: 600; text-decoration: underline; font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Terms of Use</a></p>
-            <p class="footer-right"><img src="AvId_Digital_Small.png" alt="Avid Digital"></p>
+            <p class="footer-right"><img src="AvId_Digital_Small.png" alt="Avid Digital" width="290" height="105"></p>
         </div>
     </footer>
 

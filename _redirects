@@ -1,0 +1,27 @@
+# Retires the old Timmsy's Art site at timmsys-art.netlify.app.
+#
+# Netlify deploys this repository alongside GitHub Pages, so the same content
+# was live on two addresses and competing with itself in search. Every request
+# is now permanently redirected to the Cannon Art domain, which leaves one
+# searchable site and passes any accumulated value to it.
+#
+# This file only affects Netlify. GitHub Pages builds with Jekyll, which skips
+# files whose names begin with an underscore, so it never reaches the live site.
+#
+# Netlify rewrites links to drop the .html extension, so the retired site's
+# addresses are extensionless and have to be mapped to the real .html pages by
+# hand. The trailing "!" forces the redirect to win over the file Netlify still
+# holds at that path.
+
+/dc-characters       https://cannon-art.uk.eu.org/dc-characters.html        301!
+/marvel-characters   https://cannon-art.uk.eu.org/marvel-characters.html    301!
+/music-legends       https://cannon-art.uk.eu.org/music-legends.html        301!
+/recovery-art        https://cannon-art.uk.eu.org/recovery-art.html         301!
+/miscellaneous       https://cannon-art.uk.eu.org/miscellaneous.html        301!
+/batman              https://cannon-art.uk.eu.org/batman.html               301!
+/the-who             https://cannon-art.uk.eu.org/the-who.html              301!
+/rolling-stones      https://cannon-art.uk.eu.org/rolling-stones.html       301!
+/terms-of-use        https://cannon-art.uk.eu.org/terms-of-use.html         301!
+/control-panel       https://cannon-art.uk.eu.org/control-panel.html        301!
+
+/*                   https://cannon-art.uk.eu.org/:splat                    301!

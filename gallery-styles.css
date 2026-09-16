@@ -82,8 +82,10 @@
 .gallery-image-container {
     position: relative;
     overflow: hidden;
+    /* Reserve the thumbnail frame before the file arrives so the card
+       never collapses into an empty gap. */
     aspect-ratio: 4/3;
-    background-color: #f8f9fa;
+    background-color: #ece8e1;
 }
 
 .gallery-image {

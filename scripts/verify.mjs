@@ -2,7 +2,7 @@
  * Local pre-push checks (no GitHub, no extra npm dependencies).
  * Run: npm test   or   node scripts/verify.mjs
  */
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { spawnSync } from 'child_process';
@@ -174,18 +174,42 @@ function checkControlPanelUi() {
 }
 
 function checkFreeAnalytics() {
-    const analyticsJs = readFileSync(join(ROOT, 'analytics.js'), 'utf8');
-    if (analyticsJs.includes('plausible.io')) {
-        fail('analytics.js — Plausible script still present');
-    } else {
-        pass('analytics.js — Plausible removed');
+    // Visit data used to reach a Netlify function on the Paul Casso site via
+    // analytics.js -> simple-analytics.js, reachable only from the archived
+    // pages' cookie banner. All of that is gone; the official Simple Analytics
+    // tag is the only analytics now. Paul Casso's site is unaffected - it owns
+    // that function, and this repo was only ever one of its callers.
+    let unwired = true;
+    for (const name of ['analytics.js', 'simple-analytics.js']) {
+        if (existsSync(join(ROOT, name))) {
+            fail(`${name} — retired Netlify analytics file has reappeared`);
+            unwired = false;
+        }
     }
-
-    const simple = readFileSync(join(ROOT, 'simple-analytics.js'), 'utf8');
-    if (!simple.includes('sendBeacon') || !simple.includes('paulcasso-website.netlify.app/.netlify/functions/analytics')) {
-        fail('simple-analytics.js — missing shared free analytics endpoint');
-    } else {
-        pass('simple-analytics.js — posts to free shared store');
+    const scanned = [
+        ...readdirSync(ROOT)
+            .filter((f) => f.endsWith('.js') || f.endsWith('.html'))
+            .map((f) => ['', f]),
+        ...(existsSync(join(ROOT, 'Archive'))
+            ? readdirSync(join(ROOT, 'Archive'))
+                  .filter((f) => f.endsWith('.html'))
+                  .map((f) => ['Archive', f])
+            : [])
+    ];
+    for (const [dir, name] of scanned) {
+        const body = readFileSync(join(ROOT, dir, name), 'utf8');
+        const label = dir ? `${dir}/${name}` : name;
+        if (body.includes('.netlify/functions/analytics')) {
+            fail(`${label} — still posts to the Netlify analytics function`);
+            unwired = false;
+        }
+        if (body.includes('plausible.io')) {
+            fail(`${label} — Plausible script is back`);
+            unwired = false;
+        }
+    }
+    if (unwired) {
+        pass('Netlify analytics wiring removed (Paul Casso site untouched)');
     }
 
     const panel = readFileSync(join(ROOT, 'control-panel.html'), 'utf8');
@@ -296,6 +320,223 @@ function checkFreeAnalytics() {
     }
 }
 
+/**
+ * Search-engine checks.
+ *
+ * cannon-art.github.io and the www subdomain both 301 to SITE_ORIGIN, so any
+ * canonical, social or sitemap URL naming them points search engines at an
+ * address that redirects. These checks exist because html-generator.js rebuilds
+ * the gallery pages from the control panel, which would otherwise quietly
+ * reintroduce the old host.
+ */
+const SITE_ORIGIN = 'https://cannon-art.uk.eu.org';
+
+const INDEXABLE_PAGES = [
+    'index.html',
+    'dc-characters.html',
+    'marvel-characters.html',
+    'music-legends.html',
+    'recovery-art.html',
+    'miscellaneous.html',
+    'batman.html',
+    'the-who.html',
+    'rolling-stones.html'
+];
+
+const NOINDEX_PAGES = ['control-panel.html', 'terms-of-use.html'];
+
+function canonicalFor(name) {
+    return name === 'index.html' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/${name}`;
+}
+
+function checkSeo() {
+    // Only real attribute values matter; explanatory comments may mention the old host.
+    const staleHost = /(?:href|content)="https:\/\/cannon-art\.github\.io/;
+
+    let canonicalsOk = true;
+    let headingsOk = true;
+    for (const name of INDEXABLE_PAGES) {
+        const html = readFileSync(join(ROOT, name), 'utf8');
+
+        const canonical = (html.match(/rel="canonical"\s+href="([^"]+)"/) || [])[1];
+        if (canonical !== canonicalFor(name)) {
+            fail(`${name} — canonical is "${canonical}", expected "${canonicalFor(name)}"`);
+            canonicalsOk = false;
+        }
+        if (staleHost.test(html)) {
+            fail(`${name} — still points at cannon-art.github.io, which redirects`);
+            canonicalsOk = false;
+        }
+        if (!html.includes('<meta name="robots" content="index, follow">')) {
+            fail(`${name} — missing an indexable robots tag`);
+            canonicalsOk = false;
+        }
+
+        const h1Count = (html.match(/<h1[\s>]/g) || []).length;
+        if (h1Count !== 1) {
+            fail(`${name} — has ${h1Count} <h1> elements, expected exactly 1`);
+            headingsOk = false;
+        }
+        if (/<h1[^>]*class="logo"/.test(html)) {
+            fail(`${name} — the logo is the <h1>, so the page topic is not the heading`);
+            headingsOk = false;
+        }
+    }
+    if (canonicalsOk) pass(`public pages — canonical and social URLs use ${SITE_ORIGIN}`);
+    if (headingsOk) pass('public pages — exactly one topic-describing <h1> each');
+
+    let noindexOk = true;
+    for (const name of NOINDEX_PAGES) {
+        const html = readFileSync(join(ROOT, name), 'utf8');
+        if (!/<meta name="robots" content="noindex/.test(html)) {
+            fail(`${name} — should be noindex but is crawlable`);
+            noindexOk = false;
+        }
+    }
+    if (noindexOk) pass('control panel and terms pages — kept out of search results');
+
+    const sitemap = readFileSync(join(ROOT, 'sitemap.xml'), 'utf8');
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    let sitemapOk = true;
+    for (const loc of locs) {
+        if (!loc.startsWith(`${SITE_ORIGIN}/`)) {
+            fail(`sitemap.xml — "${loc}" is not on ${SITE_ORIGIN}`);
+            sitemapOk = false;
+        }
+    }
+    for (const name of INDEXABLE_PAGES) {
+        if (!locs.includes(canonicalFor(name))) {
+            fail(`sitemap.xml — missing ${canonicalFor(name)}`);
+            sitemapOk = false;
+        }
+    }
+    for (const name of NOINDEX_PAGES) {
+        if (locs.includes(canonicalFor(name))) {
+            fail(`sitemap.xml — lists ${name}, which is noindex`);
+            sitemapOk = false;
+        }
+    }
+    if (sitemapOk) pass(`sitemap.xml — ${locs.length} canonical URLs, no noindex pages`);
+
+    const robots = readFileSync(join(ROOT, 'robots.txt'), 'utf8');
+    if (!robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`)) {
+        fail('robots.txt — Sitemap line must use the canonical domain');
+    } else {
+        pass('robots.txt — points at the canonical sitemap');
+    }
+}
+
+/**
+ * Runs the generator the control panel uses and inspects what it produces, so a
+ * regression is caught here rather than after the pages are republished.
+ */
+function checkGeneratedPages() {
+    const src = readFileSync(join(ROOT, 'html-generator.js'), 'utf8');
+    let api;
+    try {
+        api = new Function(
+            'window',
+            'document',
+            `${src}\nreturn { generateGalleryHTML, SECTION_METADATA };`
+        )({}, {});
+    } catch (e) {
+        fail(`html-generator.js — could not be evaluated: ${e.message}`);
+        return;
+    }
+
+    const data = JSON.parse(readFileSync(join(ROOT, 'gallery-data.json'), 'utf8'));
+    let ok = true;
+    for (const id of REQUIRED_SECTIONS) {
+        const pictures = (data.sections && data.sections[id]) || [];
+        let html;
+        try {
+            html = api.generateGalleryHTML(id, pictures, api.SECTION_METADATA[id]);
+        } catch (e) {
+            fail(`html-generator.js — generating ${id} threw: ${e.message}`);
+            ok = false;
+            continue;
+        }
+        const canonical = (html.match(/rel="canonical"\s+href="([^"]+)"/) || [])[1];
+        if (canonical !== `${SITE_ORIGIN}/${id}.html`) {
+            fail(`html-generator.js — ${id} canonical is "${canonical}"`);
+            ok = false;
+        }
+        if (!/<h1 class="hero-title">/.test(html)) {
+            fail(`html-generator.js — ${id} does not use <h1> for the page topic`);
+            ok = false;
+        }
+        if (!/aria-expanded="false" aria-controls="mainNav"/.test(html)) {
+            fail(`html-generator.js — ${id} menu button is missing its ARIA state`);
+            ok = false;
+        }
+        if (pictures.length > 0) {
+            if (!/class="gallery-image" width="1600" height="1200" fetchpriority="high"/.test(html)) {
+                fail(`html-generator.js — ${id} first artwork is not reserved and eagerly fetched`);
+                ok = false;
+            }
+        }
+        if (pictures.length > 1 && !/class="gallery-image" width="1600" height="1200" loading="lazy"/.test(html)) {
+            fail(`html-generator.js — ${id} later artworks should lazy-load`);
+            ok = false;
+        }
+    }
+    if (ok) pass('html-generator.js — regenerated pages keep canonical, <h1>, ARIA and reserved image frames');
+}
+
+function checkImageLayout() {
+    const indexHtml = readFileSync(join(ROOT, 'index.html'), 'utf8');
+    const cards = [...indexHtml.matchAll(/<img[^>]*class="collection-image"[^>]*>/g)].map((m) => m[0]);
+    let ok = true;
+    if (cards.length === 0) {
+        fail('index.html — no collection thumbnails found');
+        return;
+    }
+    if (!cards[0].includes('fetchpriority="high"') || cards[0].includes('loading="lazy"')) {
+        fail('index.html — first collection image should load immediately');
+        ok = false;
+    }
+    cards.forEach((tag, i) => {
+        if (!/width="1600"/.test(tag) || !/height="1200"/.test(tag)) {
+            fail(`index.html — collection image ${i + 1} is missing a reserved 4:3 frame`);
+            ok = false;
+        }
+        if (i > 0 && !tag.includes('loading="lazy"')) {
+            fail(`index.html — collection image ${i + 1} should lazy-load`);
+            ok = false;
+        }
+    });
+
+    const galleryPages = [
+        'dc-characters.html',
+        'marvel-characters.html',
+        'recovery-art.html',
+        'miscellaneous.html',
+        'batman.html',
+        'the-who.html',
+        'rolling-stones.html'
+    ];
+    for (const name of galleryPages) {
+        const html = readFileSync(join(ROOT, name), 'utf8');
+        const imgs = [...html.matchAll(/<img[^>]*class="gallery-image"[^>]*>/g)].map((m) => m[0]);
+        if (imgs.length === 0) {
+            fail(`${name} — no gallery images found`);
+            ok = false;
+            continue;
+        }
+        imgs.forEach((tag, i) => {
+            if (!/width="1600"/.test(tag) || !/height="1200"/.test(tag)) {
+                fail(`${name} — gallery image ${i + 1} is missing a reserved 4:3 frame`);
+                ok = false;
+            }
+        });
+        if (!imgs[0].includes('fetchpriority="high"') || imgs[0].includes('loading="lazy"')) {
+            fail(`${name} — first artwork should load immediately`);
+            ok = false;
+        }
+    }
+    if (ok) pass('gallery thumbnails — reserved 4:3 frames, first image loads immediately');
+}
+
 console.log('Local verify (pre-push)\n');
 checkJavaScriptSyntax();
 console.log('');
@@ -304,6 +545,12 @@ console.log('');
 checkControlPanelUi();
 console.log('');
 checkFreeAnalytics();
+console.log('');
+checkSeo();
+console.log('');
+checkGeneratedPages();
+console.log('');
+checkImageLayout();
 
 if (failures > 0) {
     console.error(`\n${failures} check(s) failed. Fix issues before pushing to GitHub.\n`);
