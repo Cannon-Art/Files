@@ -120,6 +120,76 @@
           "pageviews": 4
         }
       ]
+    },
+    {
+      "capturedAt": "2026-11-01T11:43:35.383Z",
+      "start": "2026-10-01T23:00:00.000Z",
+      "end": "2026-10-31T23:59:59.999Z",
+      "visitors": 12,
+      "pageviews": 32,
+      "seconds_on_page": 55,
+      "pages": [
+        {
+          "value": "/",
+          "visitors": 9,
+          "pageviews": 9
+        },
+        {
+          "value": "/control-panel.html",
+          "visitors": 3,
+          "pageviews": 5
+        },
+        {
+          "value": "/dc-characters.html",
+          "visitors": 0,
+          "pageviews": 4
+        },
+        {
+          "value": "/marvel-characters.html",
+          "visitors": 0,
+          "pageviews": 3
+        },
+        {
+          "value": "/miscellaneous.html",
+          "visitors": 0,
+          "pageviews": 2
+        },
+        {
+          "value": "/music-legends.html",
+          "visitors": 0,
+          "pageviews": 2
+        },
+        {
+          "value": "/recovery-art.html",
+          "visitors": 0,
+          "pageviews": 1
+        }
+      ],
+      "countries": [
+        {
+          "value": "gb",
+          "visitors": 8,
+          "pageviews": 28
+        },
+        {
+          "value": "us",
+          "visitors": 4,
+          "pageviews": 4
+        }
+      ],
+      "referrers": [],
+      "device_types": [
+        {
+          "value": "desktop",
+          "visitors": 7,
+          "pageviews": 17
+        },
+        {
+          "value": "mobile",
+          "visitors": 5,
+          "pageviews": 15
+        }
+      ]
     }
   ],
   "days": {
@@ -364,6 +434,130 @@
       "pageviews": 0
     },
     "2026-10-01": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-02": {
+      "visitors": 4,
+      "pageviews": 4
+    },
+    "2026-10-03": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-04": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-05": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-06": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-07": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-08": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-09": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-10": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-11": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-12": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-13": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-14": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-15": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-16": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-17": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-18": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-19": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-20": {
+      "visitors": 1,
+      "pageviews": 6
+    },
+    "2026-10-21": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-22": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-23": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-24": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-25": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-26": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-27": {
+      "visitors": 1,
+      "pageviews": 1
+    },
+    "2026-10-28": {
+      "visitors": 2,
+      "pageviews": 2
+    },
+    "2026-10-29": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-30": {
+      "visitors": 0,
+      "pageviews": 0
+    },
+    "2026-10-31": {
+      "visitors": 4,
+      "pageviews": 19
+    },
+    "2026-11-01": {
       "visitors": 0,
       "pageviews": 0
     }
