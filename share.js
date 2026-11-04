@@ -25,11 +25,22 @@
         return item.id ? `${base}#${item.id}` : base;
     }
 
+    // Pictures are stored in this repository and referenced through
+    // raw.githubusercontent.com. GitHub serves larger files from there as
+    // "application/octet-stream", which makes browsers download them instead
+    // of showing them. The same file on the site's own address is served as an
+    // image, so it opens in the browser's picture viewer.
+    const RAW_PREFIX = 'https://raw.githubusercontent.com/Cannon-Art/Files/main/';
+
     function pictureLinkFor(item) {
         const media = item.querySelector('.gallery-image');
         if (!media) return '';
         // canvas-protection.js keeps the original address on the canvas.
-        return media.dataset.originalSrc || media.currentSrc || media.src || '';
+        const src = media.dataset.originalSrc || media.currentSrc || media.src || '';
+        if (src.indexOf(RAW_PREFIX) === 0) {
+            return `${window.location.origin}/${src.slice(RAW_PREFIX.length)}`;
+        }
+        return src;
     }
 
     function titleFor(item) {
