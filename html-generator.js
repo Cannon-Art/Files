@@ -123,23 +123,53 @@ function formatNotes(text) {
 }
 
 /**
- * Generate preview text from full notes (first 150 characters).
- * Bold markers are dropped so they never show as stray asterisks, and
- * paragraph breaks are kept (see formatPreview).
+ * Generate preview text from full notes: the first 150 visible characters.
+ * Bold markers are kept but not counted, and a bold run cut off by the limit
+ * is closed, so the preview shows bold exactly as the full notes do.
  */
+const PREVIEW_LENGTH = 150;
+
 function getPreviewText(text) {
     if (!text) return '';
-    const plain = normaliseParagraphs(text.replace(/\*\*/g, ''));
-    const preview = plain.substring(0, 150).trimEnd();
-    return preview + (plain.length > 150 ? '...' : '');
+    const source = normaliseParagraphs(text);
+    let out = '';
+    let visible = 0;
+    let boldOpen = false;
+    let i = 0;
+    while (i < source.length && visible < PREVIEW_LENGTH) {
+        if (source.startsWith('**', i)) {
+            out += '**';
+            boldOpen = !boldOpen;
+            i += 2;
+            continue;
+        }
+        out += source[i];
+        visible += 1;
+        i += 1;
+    }
+    // Skip any markers sitting right at the cut so "more follows" is accurate.
+    while (source.startsWith('**', i)) {
+        out += '**';
+        boldOpen = !boldOpen;
+        i += 2;
+    }
+    const truncated = i < source.length;
+    out = out.trimEnd();
+    // Close a bold run the cut went through, but only if the full notes close
+    // it too; an unclosed ** shows as typed in both places.
+    if (boldOpen && source.indexOf('**', i) !== -1) {
+        out = out.endsWith('**') ? out.slice(0, -2).trimEnd() : out + '**';
+    }
+    return out + (truncated ? '...' : '');
 }
 
 /**
- * Preview as HTML: escaped, with the same paragraph gaps as the full notes.
+ * Preview as HTML: escaped, bold applied, same paragraph gaps as the full
+ * notes.
  */
 function formatPreview(text) {
     if (!text) return '';
-    return nl2br(escapeHtml(getPreviewText(text)));
+    return formatNotes(getPreviewText(text));
 }
 
 /**
@@ -287,7 +317,7 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=18">
-    <link rel="stylesheet" href="gallery-styles.css?v=21">
+    <link rel="stylesheet" href="gallery-styles.css?v=22">
 </head>
 <body>
     <header class="header">

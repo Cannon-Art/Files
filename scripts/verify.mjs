@@ -6,6 +6,7 @@ import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { spawnSync } from 'child_process';
+import { STAMPED_SCRIPTS, contentVersion, scriptPattern } from './stamp-versions.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -563,6 +564,25 @@ console.log('');
 checkGeneratedPages();
 console.log('');
 checkImageLayout();
+console.log('');
+checkControlPanelScriptVersions();
+
+// A stale ?v= lets browsers keep an old generator, and the control panel then
+// rebuilds pages with it, undoing recent changes. See stamp-versions.mjs.
+function checkControlPanelScriptVersions() {
+    const html = readFileSync(join(ROOT, 'control-panel.html'), 'utf8');
+    for (const name of STAMPED_SCRIPTS) {
+        const match = html.match(scriptPattern(name));
+        const expected = `?v=${contentVersion(name)}`;
+        if (!match) {
+            fail(`control-panel.html does not load ${name}`);
+        } else if (match[2] !== expected) {
+            fail(`control-panel.html loads ${name}${match[2] || ''}, expected ${expected} — run: npm run stamp`);
+        } else {
+            pass(`control-panel.html loads current ${name}`);
+        }
+    }
+}
 
 if (failures > 0) {
     console.error(`\n${failures} check(s) failed. Fix issues before pushing to GitHub.\n`);
