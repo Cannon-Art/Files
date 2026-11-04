@@ -257,6 +257,36 @@
             font-family: Arial, Calibri;
         }
 
+        /* Bold button above the notes boxes (control-panel.js) */
+        .notes-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .notes-bold-btn {
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            color: #222;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .notes-bold-btn:hover,
+        .notes-bold-btn:focus-visible {
+            border-color: #169B62;
+            color: #169B62;
+        }
+
+        .notes-hint {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
         .section-tabs {
             display: flex;
             gap: 0.5rem;
@@ -698,9 +728,9 @@
         </div>
     </div>
 
-    <script src="html-generator.js?v=20260425-4"></script>
+    <script src="html-generator.js?v=20261105-1"></script>
     <script src="analytics-dashboard.js?v=20260829-4"></script>
-    <script src="control-panel.js?v=20260829-2"></script>
+    <script src="control-panel.js?v=20261105-1"></script>
     <!-- 100% privacy-first analytics -->
     <script async data-hostname="cannon-art.uk.eu.org" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>

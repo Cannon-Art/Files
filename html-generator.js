@@ -86,20 +86,60 @@ function getSimpleAnalyticsMarkup() {
 }
 
 /**
- * Convert newlines to <br> tags for HTML display
+ * Tidy paragraph breaks in notes. Windows line endings become plain newlines,
+ * and any run of Enters (with stray spaces between) becomes a single break,
+ * so one Enter or several always gives the same paragraph gap.
  */
-function nl2br(text) {
+function normaliseParagraphs(text) {
     if (!text) return '';
-    return text.replace(/\n/g, '<br><br>');
+    return text.replace(/\r\n?/g, '\n').trim().replace(/[ \t]*\n\s*/g, '\n');
 }
 
 /**
- * Generate preview text from full notes (first 150 characters)
+ * Convert paragraph breaks to HTML: each new paragraph starts after one
+ * blank line.
+ */
+function nl2br(text) {
+    if (!text) return '';
+    return normaliseParagraphs(text).replace(/\n/g, '<br><br>');
+}
+
+/**
+ * Bold text in notes: **like this** becomes <strong>like this</strong>.
+ * Run on text that has already been escaped, so only the <strong> tags this
+ * adds are HTML. A bold run stays within one line.
+ */
+function applyBold(escapedText) {
+    if (!escapedText) return '';
+    return escapedText.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+}
+
+/**
+ * Notes as HTML: escaped, bold applied, line breaks kept.
+ */
+function formatNotes(text) {
+    if (!text) return '';
+    return nl2br(applyBold(escapeHtml(text)));
+}
+
+/**
+ * Generate preview text from full notes (first 150 characters).
+ * Bold markers are dropped so they never show as stray asterisks, and
+ * paragraph breaks are kept (see formatPreview).
  */
 function getPreviewText(text) {
     if (!text) return '';
-    const preview = text.substring(0, 150);
-    return preview + (text.length > 150 ? '...' : '');
+    const plain = normaliseParagraphs(text.replace(/\*\*/g, ''));
+    const preview = plain.substring(0, 150).trimEnd();
+    return preview + (plain.length > 150 ? '...' : '');
+}
+
+/**
+ * Preview as HTML: escaped, with the same paragraph gaps as the full notes.
+ */
+function formatPreview(text) {
+    if (!text) return '';
+    return nl2br(escapeHtml(getPreviewText(text)));
 }
 
 /**
@@ -112,8 +152,8 @@ function getPreviewText(text) {
  */
 function generateGalleryItem(picture, index) {
     const hasNotes = picture.notes && picture.notes.trim().length > 0;
-    const previewText = hasNotes ? getPreviewText(picture.notes) : '';
-    const fullNotes = hasNotes ? nl2br(escapeHtml(picture.notes)) : '';
+    const previewText = hasNotes ? formatPreview(picture.notes) : '';
+    const fullNotes = hasNotes ? formatNotes(picture.notes) : '';
     const yearDisplay = picture.year ? ` (${picture.year})` : '';
     const loadingAttrs = index === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
     // 1600x1200 matches the 4:3 thumbnail frame in CSS. Using the display
@@ -138,7 +178,7 @@ function generateGalleryItem(picture, index) {
         html += `
                         <div class="gallery-notes">
                             <div class="notes-preview">
-                                <p class="notes-text-preview">${escapeHtml(previewText)}</p>
+                                <p class="notes-text-preview">${previewText}</p>
                                 <button class="expand-notes-btn">... read more</button>
                             </div>
                             <div class="notes-full" style="display: none;">

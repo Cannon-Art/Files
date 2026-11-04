@@ -1233,6 +1233,7 @@ function appendPictureEditor(container, picture, sectionKey, sectionName) {
     );
     notesWrap.appendChild(notesLab);
     notesWrap.appendChild(ta);
+    addNotesBoldTools(ta);
     pictureItem.appendChild(notesWrap);
 
     const restoreWrap = document.createElement('div');
@@ -1538,3 +1539,92 @@ function callHTMLGenerator(galleryData) {
     console.error('html-generator.js not loaded! Cannot generate HTML files.');
     throw new Error('HTML generator not available. Please refresh the page to reload html-generator.js');
 }
+
+// ============================================================================
+// NOTES FORMATTING: bold
+// ============================================================================
+
+// Text wrapped in **double asterisks** shows in bold on the gallery page
+// (html-generator.js turns it into <strong>). This adds a "B" button above a
+// notes box that wraps the selected text in ** **, or removes them if the
+// selection is already bold, plus a one-line hint.
+function addNotesBoldTools(textarea) {
+    if (!textarea || textarea.dataset.boldTools === 'true') return;
+    textarea.dataset.boldTools = 'true';
+
+    const bar = document.createElement('div');
+    bar.className = 'notes-toolbar';
+
+    const boldBtn = document.createElement('button');
+    boldBtn.type = 'button';
+    boldBtn.className = 'notes-bold-btn';
+    boldBtn.innerHTML = '<strong>B</strong>';
+    boldBtn.title = 'Bold the selected text';
+    boldBtn.setAttribute('aria-label', 'Bold the selected text');
+    // Keep the selection in the box when the button is pressed.
+    boldBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    boldBtn.addEventListener('click', () => toggleBoldInTextarea(textarea));
+    bar.appendChild(boldBtn);
+
+    const hint = document.createElement('span');
+    hint.className = 'notes-hint';
+    hint.textContent = 'Select words and press B, or type **like this**, to show them in bold.';
+    bar.appendChild(hint);
+
+    textarea.parentNode.insertBefore(bar, textarea);
+}
+
+function toggleBoldInTextarea(textarea) {
+    const value = textarea.value;
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+
+    // Leave surrounding spaces outside the markers, or ** word ** will not
+    // be recognised as bold.
+    while (start < end && /\s/.test(value[start])) start++;
+    while (end > start && /\s/.test(value[end - 1])) end--;
+
+    const selected = value.slice(start, end);
+    const before = value.slice(0, start);
+    const after = value.slice(end);
+
+    if (selected && selected.indexOf('\n') !== -1) {
+        alert('Bold works within one line or paragraph. Please select text on a single line.');
+        return;
+    }
+
+    let newValue;
+    let selStart;
+    let selEnd;
+
+    if (before.endsWith('**') && after.startsWith('**')) {
+        // Already bold: remove the markers around the selection.
+        newValue = before.slice(0, -2) + selected + after.slice(2);
+        selStart = start - 2;
+        selEnd = end - 2;
+    } else if (selected.length > 4 && selected.startsWith('**') && selected.endsWith('**')) {
+        // The markers were selected too: remove them.
+        const inner = selected.slice(2, -2);
+        newValue = before + inner + after;
+        selStart = start;
+        selEnd = start + inner.length;
+    } else if (selected) {
+        newValue = before + '**' + selected + '**' + after;
+        selStart = start + 2;
+        selEnd = end + 2;
+    } else {
+        // Nothing selected: insert markers and put the cursor between them.
+        newValue = before + '****' + after;
+        selStart = selEnd = start + 2;
+    }
+
+    textarea.value = newValue;
+    textarea.focus();
+    textarea.setSelectionRange(selStart, selEnd);
+    // Let existing listeners (such as auto-save in edit mode) see the change.
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    addNotesBoldTools(document.getElementById('pictureNotes'));
+});
