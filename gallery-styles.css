@@ -141,6 +141,49 @@
     font-weight: 400;
 }
 
+/* Share links (share.js) */
+.share-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.share-btn {
+    background-color: transparent;
+    color: #007AFF;
+    border: 1px solid #007AFF;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.share-btn:hover,
+.share-btn:focus-visible {
+    background-color: #007AFF;
+    color: #fff;
+}
+
+.share-link-box {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Brief highlight when someone arrives from a shared picture link */
+.gallery-item.share-highlight {
+    box-shadow: 0 0 0 4px #169B62;
+    transition: box-shadow 0.3s ease;
+}
+
 /* Gallery Notes Section */
 .gallery-notes {
     padding: 0 2rem 2rem 2rem;

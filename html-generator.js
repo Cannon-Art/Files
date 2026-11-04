@@ -122,7 +122,7 @@ function generateGalleryItem(picture, index) {
     const sizeAttrs = 'width="1600" height="1200"';
 
     let html = `
-                    <div class="gallery-item">
+                    <div class="gallery-item" id="${escapeHtml(picture.id)}">
                         <div class="gallery-image-container">
                             <img src="${escapeHtml(picture.imageUrl)}" alt="${escapeHtml(picture.name)}" class="gallery-image" ${sizeAttrs} ${loadingAttrs}>
                             <div class="gallery-overlay">
@@ -247,7 +247,7 @@ function generateGalleryHTML(sectionId, pictures, metadata) {
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=18">
-    <link rel="stylesheet" href="gallery-styles.css?v=19">
+    <link rel="stylesheet" href="gallery-styles.css?v=20">
 </head>
 <body>
     <header class="header">
@@ -328,6 +328,7 @@ ${descriptionHTML.trim()}
     </script>
     <script src="protection.js"></script>
     <script src="canvas-protection.js"></script>
+    <script src="share.js"></script>
     <script>
         // Full size image viewer - handles both img and canvas elements
         document.querySelectorAll('.view-btn').forEach(btn => {

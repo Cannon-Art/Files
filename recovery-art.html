@@ -75,7 +75,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=18">
-    <link rel="stylesheet" href="gallery-styles.css?v=19">
+    <link rel="stylesheet" href="gallery-styles.css?v=20">
 </head>
 <body>
     <header class="header">
@@ -119,7 +119,7 @@
                 <h2 class="section-title">The Collection</h2>
                 <div class="gallery-grid">
 
-                    <div class="gallery-item">
+                    <div class="gallery-item" id="recovery-001">
                         <div class="gallery-image-container">
                             <img src="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/Recovery_5.JPEG" alt="Escape from the Clutches of Addiction" class="gallery-image" width="1600" height="1200" fetchpriority="high">
                             <div class="gallery-overlay">
@@ -132,16 +132,16 @@
                         </div>
                         <div class="gallery-notes">
                             <div class="notes-preview">
-                                <p class="notes-text-preview">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction's constant pull—its pressure, ...</p>
+                                <p class="notes-text-preview">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction&#039;s constant pull—its pressure, ...</p>
                                 <button class="expand-notes-btn">... read more</button>
                             </div>
                             <div class="notes-full" style="display: none;">
-                                <p class="notes-text-full">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction's constant pull—its pressure, control, and refusal to let go. The figure turning forward and opening their mouth reflects an act of resistance: a choice to speak, to breathe, and to move in a different direction. The words "This way to escape the clutches of addiction" point toward hope, though not an easy escape—one that demands effort, pain, and determination. It captures a transition in which addiction is still present but no longer in control, and where reclaiming one's voice and direction marks the first step toward a life without addiction.</p>
+                                <p class="notes-text-full">This image represents the moment of breaking free. The hands gripping the head and pulling backward symbolise addiction&#039;s constant pull—its pressure, control, and refusal to let go. The figure turning forward and opening their mouth reflects an act of resistance: a choice to speak, to breathe, and to move in a different direction. The words &quot;This way to escape the clutches of addiction&quot; point toward hope, though not an easy escape—one that demands effort, pain, and determination. It captures a transition in which addiction is still present but no longer in control, and where reclaiming one&#039;s voice and direction marks the first step toward a life without addiction.</p>
                                 <button class="collapse-notes-btn">... read less</button>
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" id="recovery-002">
                         <div class="gallery-image-container">
                             <img src="https://raw.githubusercontent.com/Cannon-Art/Files/main/Art_Examples/HELP!!.JPG" alt="HELP!!" class="gallery-image" width="1600" height="1200" loading="lazy">
                             <div class="gallery-overlay">
@@ -190,6 +190,7 @@
     </script>
     <script src="protection.js"></script>
     <script src="canvas-protection.js"></script>
+    <script src="share.js"></script>
     <script>
         // Full size image viewer - handles both img and canvas elements
         document.querySelectorAll('.view-btn').forEach(btn => {

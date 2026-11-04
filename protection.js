@@ -16,9 +16,11 @@
         return isEditableElement(e.target) || isEditableElement(document.activeElement);
     }
 
-    // Disable right-click context menu
+    // Disable right-click context menu, except on links, so visitors can
+    // still use "Copy link address" to share a page. Pictures stay blocked.
     document.addEventListener('contextmenu', function(e) {
         if (isEditableTarget(e)) return;
+        if (e.target.closest && e.target.closest('a[href]')) return;
         e.preventDefault();
         return false;
     });
