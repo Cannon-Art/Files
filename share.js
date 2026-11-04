@@ -1,29 +1,22 @@
 /**
- * Share links for individual pictures.
+ * Share button for individual pictures.
  *
  * protection.js blocks right-click and copying, and canvas-protection.js
- * replaces each picture with a canvas, so visitors cannot copy a page or
- * picture address in the usual way. This adds deliberate share controls
- * instead, so links can be sent to other platforms without loosening the
- * protection on the artwork itself.
+ * replaces each picture with a canvas, so visitors cannot copy a picture's
+ * address in the usual way. This adds one deliberate Share button per picture
+ * instead, without loosening the protection on the artwork itself.
  *
- * Each .gallery-item carries an id (the picture's id from gallery-data.json),
- * which gives every picture its own address: page.html#dc-001. Opening that
- * address scrolls to the picture and highlights it.
+ * The shared link is the picture file on the site's own address, so whoever
+ * opens it sees the picture in their browser's picture viewer.
+ *  - Phones, and browsers with a share menu: opens that menu (WhatsApp,
+ *    Messages, Facebook and so on) with the picture link.
+ *  - Everywhere else: copies the picture link and says "Link copied".
  *
- * Two links are offered per picture:
- *  - Page link: the gallery page, scrolled to this picture (best for posts,
- *    since it brings people to the site).
- *  - Picture link: the image file itself (for platforms that want a direct
- *    image address).
+ * Each .gallery-item also carries an id (the picture's id from
+ * gallery-data.json), so page.html#dc-001 scrolls to that picture.
  */
 (function () {
     'use strict';
-
-    function pageLinkFor(item) {
-        const base = window.location.href.split('#')[0];
-        return item.id ? `${base}#${item.id}` : base;
-    }
 
     // Pictures are stored in this repository and referenced through
     // raw.githubusercontent.com. GitHub serves larger files from there as
@@ -48,9 +41,9 @@
         return title ? title.textContent.trim() : document.title;
     }
 
-    // navigator.clipboard needs https (the live site) or localhost. The
-    // fallback covers older browsers; it uses a temporary text box, which
-    // protection.js allows because it lets editable fields copy.
+    // navigator.clipboard needs https (the live site) or localhost. If it is
+    // refused, fall back to a temporary text box, which protection.js allows
+    // because it lets editable fields copy.
     function copyText(text) {
         if (navigator.clipboard && window.isSecureContext) {
             return navigator.clipboard.writeText(text).catch(function () {
@@ -87,7 +80,7 @@
     }
 
     // Last resort when the browser refuses to copy: show the link under the
-    // buttons, already selected, so it can be copied by hand.
+    // button, already selected, so it can be copied by hand.
     function showLink(bar, link) {
         let box = bar.parentNode.querySelector('.share-link-box');
         if (!box) {
@@ -103,11 +96,7 @@
         box.select();
     }
 
-    function handleCopy(button, link) {
-        if (!link) {
-            flash(button, 'No link found');
-            return;
-        }
+    function copyLink(button, link) {
         copyText(link).then(
             function () { flash(button, 'Link copied'); },
             function () {
@@ -117,7 +106,28 @@
         );
     }
 
-    function addShareControls(item) {
+    function sharePicture(button, item) {
+        const link = pictureLinkFor(item);
+        if (!link) {
+            flash(button, 'No link found');
+            return;
+        }
+        if (navigator.share) {
+            navigator.share({
+                title: titleFor(item),
+                text: `${titleFor(item)} by Cannon Art`,
+                url: link
+            }).catch(function (err) {
+                // Closing the share menu is not an error; anything else
+                // (such as no share targets available) falls back to copying.
+                if (!err || err.name !== 'AbortError') copyLink(button, link);
+            });
+            return;
+        }
+        copyLink(button, link);
+    }
+
+    function addShareButton(item) {
         if (item.querySelector('.share-controls')) return;
         const info = item.querySelector('.gallery-info');
         if (!info) return;
@@ -125,45 +135,20 @@
         const bar = document.createElement('div');
         bar.className = 'share-controls';
 
-        // Phones and some desktop browsers have a native share sheet that
-        // goes straight to Messages, WhatsApp, Facebook and so on.
-        if (navigator.share) {
-            const share = document.createElement('button');
-            share.type = 'button';
-            share.className = 'share-btn';
-            share.textContent = 'Share';
-            share.addEventListener('click', function () {
-                navigator.share({
-                    title: titleFor(item),
-                    text: `${titleFor(item)} by Cannon Art`,
-                    url: pageLinkFor(item)
-                }).catch(function () { /* closed by the visitor */ });
-            });
-            bar.appendChild(share);
-        }
-
-        const page = document.createElement('button');
-        page.type = 'button';
-        page.className = 'share-btn';
-        page.textContent = 'Copy page link';
-        page.addEventListener('click', function () {
-            handleCopy(page, pageLinkFor(item));
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'share-btn';
+        button.textContent = 'Share';
+        button.setAttribute('aria-label', `Share ${titleFor(item)}`);
+        button.addEventListener('click', function () {
+            sharePicture(button, item);
         });
-        bar.appendChild(page);
-
-        const picture = document.createElement('button');
-        picture.type = 'button';
-        picture.className = 'share-btn';
-        picture.textContent = 'Copy picture link';
-        picture.addEventListener('click', function () {
-            handleCopy(picture, pictureLinkFor(item));
-        });
-        bar.appendChild(picture);
+        bar.appendChild(button);
 
         info.appendChild(bar);
     }
 
-    // Opening page.html#picture-id brings that picture into view.
+    // page.html#picture-id brings that picture into view.
     function focusLinkedPicture() {
         const id = decodeURIComponent(window.location.hash.slice(1));
         if (!id) return;
@@ -175,7 +160,7 @@
     }
 
     function init() {
-        document.querySelectorAll('.gallery-item').forEach(addShareControls);
+        document.querySelectorAll('.gallery-item').forEach(addShareButton);
         focusLinkedPicture();
         window.addEventListener('hashchange', focusLinkedPicture);
     }

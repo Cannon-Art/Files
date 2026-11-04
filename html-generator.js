@@ -328,7 +328,7 @@ ${descriptionHTML.trim()}
     </script>
     <script src="protection.js"></script>
     <script src="canvas-protection.js"></script>
-    <script src="share.js"></script>
+    <script src="share.js?v=3"></script>
     <script>
         // Full size image viewer - handles both img and canvas elements
         document.querySelectorAll('.view-btn').forEach(btn => {
