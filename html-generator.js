@@ -18,7 +18,7 @@ const SECTION_METADATA = {
             'This collection explores the iconic characters of the DC Universe, focusing on the eternal struggle between Batman and The Joker. Each piece captures the duality of heroism and villainy that defines these legendary characters.',
             'The artworks blend traditional comic book aesthetics with contemporary artistic techniques, creating a unique visual narrative that honors the legacy of DC\'s most beloved characters.'
         ],
-        keywords: 'DC characters, Batman art, Joker art, DC Universe, comic book art, superhero art, villain art, Batman vs Joker, Heath Ledger Joker, contemporary art, mixed media',
+        keywords: 'DC characters, Batman art, Joker art, DC Universe, comic book art, superhero art, villain art, Batman vs Joker, Heath Ledger Joker, contemporary art, mixed media, Sophie Woods, @sophiewoodsart, Sophie Woods art collaboration',
         ogDescription: 'Explore Cannon DC Characters collection featuring Batman, The Joker, and iconic DC Universe heroes and villains.'
     },
     'marvel-characters': {
